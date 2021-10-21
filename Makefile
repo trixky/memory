@@ -6,9 +6,11 @@ LL = ar
 LFLAGS = -crs
 RM = rm -f
 
-SRCS =	./src/free.c \
+SRCS =	./src/block.c \
+		./src/free.c \
 		./src/malloc.c \
-		./src/realloc.c
+		./src/realloc.c \
+		./src/zone.c
 
 OBJS = $(SRCS:.c=.o)
 
