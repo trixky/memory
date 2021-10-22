@@ -51,6 +51,7 @@ void *ft_malloc(size_t size);
 void *ft_realloc(void *ptr, size_t size);
 // zone.c
 t_zone *ft_create_zone(int block_len, int block_nb);
+void ft_show_zone(t_zone *zone);
 // block.c
 t_block *ft_get_last_f_block(t_zone *zone);
 t_block *ft_get_last_m_block(t_zone *zone);

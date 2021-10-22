@@ -5,12 +5,13 @@ void *ft_malloc(size_t size) {
     printf("\n********** malloc **********\n");
     t_zone *ptr;
     if (size < BLOCK_LENGTH_SMALL_MIN) {
+    // if (1 || size < BLOCK_LENGTH_SMALL_MIN) {
         printf("====== TINY\n");
         if (!g_tiny_zones) {
             g_tiny_zones = ft_create_zone(BLOCK_LENGTH_TINY_MAX, ZONE_MIN_BLOCKS);
-            ft_create_block(g_tiny_zones, size, BLOCK_LENGTH_TINY_MIN);
         }
         ptr = g_tiny_zones;
+        ft_create_block(g_tiny_zones, size, BLOCK_LENGTH_TINY_MIN);
 
     } else if (size < BLOCK_LENGTH_LARGE_MIN) {
         printf("====== SMALL\n");
@@ -19,6 +20,7 @@ void *ft_malloc(size_t size) {
             ft_create_block(g_small_zones, size, BLOCK_LENGTH_SMALL_MIN);
         }
         ptr = g_small_zones;
+        ft_create_block(g_small_zones, size, BLOCK_LENGTH_SMALL_MIN);
     } else {
         printf("====== LARGE\n");
     }
