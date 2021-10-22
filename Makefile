@@ -1,6 +1,6 @@
 LIBRARY_NAME = memory_handler.a
 CC = gcc
-CFLAGS = -fPIC
+CFLAGS = -fPIC -O1
 # CFLAGS = -fPIC -Wall -Wextra -Werror
 LL = ar
 LFLAGS = -crs

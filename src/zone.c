@@ -6,40 +6,60 @@ t_zone *ft_create_zone(int block_length_max, int block_nb) {
     printf("\n********** ft_create_zone ********** (size = %d)\n", zone_len);
 
     t_zone *zone = (t_zone *)mmap(0, zone_len, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+
+
+    zone->size = 0;
+    zone->blocks = (t_block *)(zone + 1);
+    zone->blocks->free = true;
+    zone->blocks->size = zone_len - sizeof(t_zone) - sizeof(t_block);
+    zone->blocks->next = NULL;
+    zone->blocks->previous = NULL;
     zone->next = NULL;
-    zone->m_blocks = NULL;
-    zone->f_blocks = (t_block *)(zone + 1);
-    zone->f_blocks->next = NULL;
-    zone->f_blocks->size = zone_len - sizeof(t_zone) - sizeof(t_block);
-
-    // printf("sizeof t_zone = %ld\n",  sizeof(t_block));
-    // printf("sizeof t_zone = %ld\n",  sizeof(t_zone));
-    // printf("zone_len = %d\n", zone_len);
-
-    // printf("\nzone = %p\n", zone);
-    // printf("zone->next = %p\n", zone->next);
-    // printf("zone->m_blocks = %p\n", zone->m_blocks);
-    // printf("zone->f_blocks = %p\n", zone->f_blocks);
-    // printf("zone->f_blocks->next = %p\n", zone->f_blocks->next);
-    // printf("zone->f_blocks->size = %d\n", zone->f_blocks->size);
 
     return zone;
 }
+
+
+t_zone *ft_find_zone_from_block_for_specific_zone_type(t_zone *zone, t_block *block) {
+    t_zone *ptr_zone = zone;
+    t_block *ptr_block;
+
+    while (ptr_zone) {
+        ptr_block = ptr_zone->blocks;
+        while (ptr_block) {
+            if (ptr_block == block) {
+                return ptr_zone;
+            }
+            ptr_block = ptr_block->next;
+        }
+        ptr_zone = ptr_zone->next;
+    }
+
+    return NULL;
+}
+
+t_zone *ft_find_zone_from_block(t_zone *zone, t_block *block) {
+    t_zone *ptr_zone = ft_find_zone_from_block_for_specific_zone_type(g_tiny_zones, block);
+    if (!ptr_zone)
+        ptr_zone = ft_find_zone_from_block_for_specific_zone_type(g_small_zones, block);
+
+    return ptr_zone;
+}
+
 
 void ft_show_zone(t_zone *zone) {
     if (zone) {
         t_block *ptr;
         // free_blocks
-        printf("****** F blocks\n");
-        ptr = zone->f_blocks;
+        printf("****** blocks\n");
+        ptr = zone->blocks;
         while (ptr) {
-            printf("size = %d\n", ptr->size);
-            ptr = ptr->next;
-        }
-        printf("****** M blocks\n");
-        ptr = zone->m_blocks;
-        while (ptr) {
-            printf("size = %d\n", ptr->size);
+            printf("----------------\n");
+            printf("previous = %p\n", ptr->previous);
+            printf("me = %p\n", ptr);
+            printf("size = %ld\n", ptr->size);
+            printf("free = %s\n", ptr->free ? "true" : "false");
+            printf("next = %p\n", ptr->next);
             ptr = ptr->next;
         }
     } else {

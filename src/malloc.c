@@ -4,7 +4,7 @@
 void *ft_malloc(size_t size) {
     printf("\n********** malloc **********\n");
     t_zone *ptr;
-    if (size < BLOCK_LENGTH_SMALL_MIN) {
+    if (1 || size < BLOCK_LENGTH_SMALL_MIN) {
     // if (1 || size < BLOCK_LENGTH_SMALL_MIN) {
         printf("====== TINY\n");
         if (!g_tiny_zones) {
