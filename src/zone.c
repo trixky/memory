@@ -2,8 +2,8 @@
 
 t_zone *ft_create_zone(int block_length_max, int block_nb) {
     int zone_len = (block_length_max + sizeof(t_block)) * block_nb + sizeof(t_zone);
-    zone_len += zone_len % getpagesize(); // up to the pagesize multiple
-    printf("\n********** ft_create_zone ********** (size = %d)\n", zone_len);
+    zone_len += getpagesize() - zone_len % getpagesize(); // up to the pagesize multiple
+    printf("\n********** ft_create_zone ********** (size = %d) pagesize %d\n", zone_len, getpagesize());
 
     t_zone *zone = (t_zone *)mmap(0, zone_len, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
 
@@ -48,6 +48,8 @@ t_zone *ft_find_zone_from_block(t_zone *zone, t_block *block) {
 
 
 void ft_show_zone(t_zone *zone) {
+    printf("\n********** ft_show_zone ********** (zone = %p) \n", zone);
+
     if (zone) {
         t_block *ptr;
         // free_blocks

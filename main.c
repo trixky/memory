@@ -6,7 +6,8 @@ int main() {
     // ft_malloc(257);
     ft_malloc(16);
     void *ptr = ft_malloc(200);
-    void *ptr2 = ft_malloc(28632);
+    void *ptr2 = ft_malloc(16);
+    void *ptr3 = ft_malloc(28632);
     // ft_malloc(28680);
     // ft_malloc(100);
     // ft_malloc(100);
