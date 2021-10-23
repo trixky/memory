@@ -1,22 +1,14 @@
 #include "./includes/memory_handler.h"
 
 int main() {
+    printf("sizeof(t_zone) = %ld\n", sizeof(t_zone));
+    printf("sizeof(t_block) = %ld\n", sizeof(t_block));
     printf("=========================================\n");
-
     // ft_malloc(257);
     ft_malloc(16);
     void *ptr = ft_malloc(200);
     void *ptr2 = ft_malloc(16);
     void *ptr3 = ft_malloc(28632);
-    // ft_malloc(28680);
-    // ft_malloc(100);
-    // ft_malloc(100);
-    // ft_malloc(100);
-    // ft_malloc(100);
-    // ft_malloc(1000);
-    // ft_malloc(16);
-    // ft_realloc(NULL, 0);
-    // ft_free(NULL);
 
     ft_free(ptr);
     ft_free(ptr2);

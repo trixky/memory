@@ -1,24 +1,31 @@
 #include "../includes/memory_handler.h"
 
-t_zone *ft_create_zone(int block_length_max, int block_nb) {
+t_zone *ft_find_zone_with_a_sufficient_block_size(size_t size, t_zone *zone) {
+    while (zone && zone->max_block_size < size)
+        zone = zone->next;
+    
+    return zone;
+}
+
+t_zone *ft_create_zone(t_zone *previous_zone, int block_length_max, int block_nb) {
     int zone_len = (block_length_max + sizeof(t_block)) * block_nb + sizeof(t_zone);
     zone_len += getpagesize() - zone_len % getpagesize(); // up to the pagesize multiple
     printf("\n********** ft_create_zone ********** (size = %d) pagesize %d\n", zone_len, getpagesize());
 
-    t_zone *zone = (t_zone *)mmap(0, zone_len, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+    t_zone *new_zone = (t_zone *)mmap(0, zone_len, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
 
+    new_zone->size = 0;
+    new_zone->max_block_size = zone_len - sizeof(t_zone) - sizeof(t_block);
+    new_zone->blocks = (t_block *)(new_zone + 1);
+    new_zone->blocks->free = true;
+    new_zone->blocks->size = new_zone->max_block_size;
+    new_zone->blocks->previous = NULL;
+    new_zone->blocks->next = NULL;
+    new_zone->previous = previous_zone;
+    new_zone->next = NULL;
 
-    zone->size = 0;
-    zone->blocks = (t_block *)(zone + 1);
-    zone->blocks->free = true;
-    zone->blocks->size = zone_len - sizeof(t_zone) - sizeof(t_block);
-    zone->blocks->next = NULL;
-    zone->blocks->previous = NULL;
-    zone->next = NULL;
-
-    return zone;
+    return new_zone;
 }
-
 
 t_zone *ft_find_zone_from_block_for_specific_zone_type(t_zone *zone, t_block *block) {
     t_zone *ptr_zone = zone;

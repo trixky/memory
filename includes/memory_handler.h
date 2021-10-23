@@ -33,7 +33,9 @@ typedef struct				s_block
 
 typedef struct				s_zone {
 	int						size;
+	long int				max_block_size;
 	t_block*				blocks;
+	struct s_zone*			previous;
 	struct s_zone*			next;
 }							t_zone;
 
@@ -42,7 +44,9 @@ typedef struct				s_large {
 }							t_large;
 
 t_zone*						g_tiny_zones;
+t_zone*						g_tiny_zones_end;
 t_zone*						g_small_zones;
+t_zone*						g_small_zones_end;
 t_large*					g_larges;
 unsigned long long int		g_allowed_bytes;
 
@@ -53,11 +57,12 @@ void *ft_malloc(size_t size);
 // realloc.c
 void *ft_realloc(void *ptr, size_t size);
 // zone.c
-t_zone *ft_create_zone(int block_len, int block_nb);
+t_zone *ft_find_zone_with_a_sufficient_block_size(size_t size, t_zone *zone);
+t_zone *ft_create_zone(t_zone *previous_zone, int block_length_max, int block_nb);
 t_zone *ft_find_zone_from_block(t_zone *zone, t_block *block);
 void ft_show_zone(t_zone *zone);
 // block.c
-t_block *ft_create_block(t_zone *zone, size_t size, int block_len_min);
-t_block *ft_destroy_block(t_block *block);
+t_block *ft_create_block(t_zone *zone, size_t size);
+void ft_destroy_block(t_block *block);
 
 #endif
