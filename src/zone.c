@@ -1,10 +1,34 @@
 #include "../includes/memory_handler.h"
 
-t_zone *ft_find_zone_with_a_sufficient_block_size(size_t size, t_zone *zone) {
-    while (zone && zone->max_block_size < size)
-        zone = zone->next;
-    
-    return zone;
+t_zone *ft_find_the_optimal_free_block_in_zone(size_t size, t_zone *zone) {
+    if (zone) {
+        t_block *ptr_block = zone->blocks;
+        t_block *ptr_block_best = NULL;
+
+        while (ptr_block) {
+            if (ptr_block->free && size <= ptr_block->size && (!ptr_block_best || size < ptr_block_best->size))
+                ptr_block_best = ptr_block;
+            ptr_block = ptr_block->next;
+        }
+
+        return ptr_block_best;
+    }
+
+    return NULL;
+}
+
+t_zone *ft_find_the_optimal_free_block_in_zones(size_t size, t_zone *zone) {
+    if (zone) {
+        t_block *ptr_block = NULL;
+        
+        while (!(ptr_block = ft_find_the_optimal_free_block_in_zone(size, zone)) && zone) {
+            zone = zone->next;
+        }
+
+        return ptr_block;
+    }
+
+    return NULL;
 }
 
 t_zone *ft_create_zone(t_zone *previous_zone, int block_length_max, int block_nb) {
@@ -14,11 +38,9 @@ t_zone *ft_create_zone(t_zone *previous_zone, int block_length_max, int block_nb
 
     t_zone *new_zone = (t_zone *)mmap(0, zone_len, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
 
-    new_zone->size = 0;
-    new_zone->max_block_size = zone_len - sizeof(t_zone) - sizeof(t_block);
     new_zone->blocks = (t_block *)(new_zone + 1);
     new_zone->blocks->free = true;
-    new_zone->blocks->size = new_zone->max_block_size;
+    new_zone->blocks->size = zone_len - sizeof(t_zone) - sizeof(t_block);
     new_zone->blocks->previous = NULL;
     new_zone->blocks->next = NULL;
     new_zone->previous = previous_zone;
@@ -27,7 +49,7 @@ t_zone *ft_create_zone(t_zone *previous_zone, int block_length_max, int block_nb
     return new_zone;
 }
 
-t_zone *ft_find_zone_from_block_for_specific_zone_type(t_zone *zone, t_block *block) {
+t_zone *ft_find_zone_from_block_in_specific_zone_type(t_zone *zone, t_block *block) {
     t_zone *ptr_zone = zone;
     t_block *ptr_block;
 
@@ -46,9 +68,9 @@ t_zone *ft_find_zone_from_block_for_specific_zone_type(t_zone *zone, t_block *bl
 }
 
 t_zone *ft_find_zone_from_block(t_zone *zone, t_block *block) {
-    t_zone *ptr_zone = ft_find_zone_from_block_for_specific_zone_type(g_tiny_zones, block);
+    t_zone *ptr_zone = ft_find_zone_from_block_in_specific_zone_type(g_tiny_first_zone, block);
     if (!ptr_zone)
-        ptr_zone = ft_find_zone_from_block_for_specific_zone_type(g_small_zones, block);
+        ptr_zone = ft_find_zone_from_block_in_specific_zone_type(g_small_first_zone, block);
 
     return ptr_zone;
 }

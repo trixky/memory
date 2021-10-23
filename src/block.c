@@ -1,28 +1,24 @@
 #include "../includes/memory_handler.h"
 
-t_block *ft_create_block(t_zone *zone, size_t size) {
-    if (zone) {
-        t_block *ptr_block = zone->blocks;
+t_block *ft_malloc_block(t_block *block, size_t size) {
+    printf("\n********** ft_malloc_block **********\n");
+    if (block) {
+        if (block) {
+            printf("################### 1\n");
+            block->free = false;
+            if (block->size > size + sizeof(t_block)) {
+                printf("################### 2\n");
+                t_block *block_split = (void *)(block + 1) + size;
 
-        while (ptr_block && (!ptr_block->free || ptr_block->size < size)) {
-            ptr_block = ptr_block->next;
-        }
-
-        if (ptr_block) {
-            ptr_block->free = false;
-            if (ptr_block->size > size + sizeof(t_block)) {
-                t_block *ptr_block_split = (void *)(ptr_block + 1) + size;
-
-                ptr_block_split->free = true;
-                ptr_block_split->size = ptr_block->size - sizeof(t_block) - size;
-                ptr_block_split->next = ptr_block->next;
-                ptr_block_split->previous = ptr_block;
-                ptr_block->size = size;
-                ptr_block->next = ptr_block_split;
+                block_split->free = true;
+                block_split->size = block->size - sizeof(t_block) - size;
+                block_split->next = block->next;
+                block_split->previous = block;
+                block->size = size;
+                block->next = block_split;
             }
-            zone->size++;
 
-            return ptr_block + 1;
+            return block;
         }
     }
 
@@ -55,7 +51,7 @@ inline void ft_merge_next_free_block(t_block *block) {
 
 void ft_destroy_block(t_block *block) {
     block -= 1;
-    t_zone *ptr_zone = ft_find_zone_from_block(g_tiny_zones, block);
+    t_zone *ptr_zone = ft_find_zone_from_block(g_tiny_first_zone, block);
 
     if (block->previous && block->next)
         if (block->previous->free) {

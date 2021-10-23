@@ -1,3 +1,3 @@
 * checker si c'est bien dans l'ordre
 * checker la creation d'un block
-* ? ptr, g_tiny_zones, g_tiny_zones_end = ft_create_zone(...);
+* ? ptr, g_tiny_first_zone, g_tiny_last_zone = ft_create_zone(...);

@@ -6,15 +6,16 @@ int main() {
     printf("=========================================\n");
     // ft_malloc(257);
     ft_malloc(16);
-    void *ptr = ft_malloc(200);
-    void *ptr2 = ft_malloc(16);
-    void *ptr3 = ft_malloc(28632);
+    ft_malloc(200);
+    // void *ptr = ft_malloc(200);
+    // void *ptr2 = ft_malloc(16);
+    // void *ptr3 = ft_malloc(28632);
 
-    ft_free(ptr);
-    ft_free(ptr2);
+    // ft_free(ptr);
+    // ft_free(ptr2);
 
     printf("=========================================\n");
-    // ft_show_zone(g_small_zones);
-    ft_show_zone(g_tiny_zones);
+    // ft_show_zone(g_small_first_zone);
+    ft_show_zone(g_tiny_first_zone);
     printf("=========================================\n");
 }
