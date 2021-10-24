@@ -1,31 +1,31 @@
 #include "../includes/memory_handler.h"
 
-t_zone *ft_find_the_optimal_free_block_in_zone(size_t size, t_zone *zone) {
+t_block *ft_find_the_optimal_free_block_in_zone(size_t size, t_zone *zone) {
     if (zone) {
-        t_block *ptr_block = zone->blocks;
-        t_block *ptr_block_best = NULL;
+        t_block *block = zone->blocks;
+        t_block *block_best = NULL;
 
-        while (ptr_block) {
-            if (ptr_block->free && size <= ptr_block->size && (!ptr_block_best || size < ptr_block_best->size))
-                ptr_block_best = ptr_block;
-            ptr_block = ptr_block->next;
+        while (block) {
+            if (block->free && size <= block->size && (!block_best || size < block_best->size))
+                block_best = block;
+            block = block->next;
         }
 
-        return ptr_block_best;
+        return block_best;
     }
 
     return NULL;
 }
 
-t_zone *ft_find_the_optimal_free_block_in_zones(size_t size, t_zone *zone) {
+t_block *ft_find_the_optimal_free_block_in_zones(size_t size, t_zone *zone) {
     if (zone) {
-        t_block *ptr_block = NULL;
+        t_block *block = NULL;
         
-        while (!(ptr_block = ft_find_the_optimal_free_block_in_zone(size, zone)) && zone) {
+        while (!(block = ft_find_the_optimal_free_block_in_zone(size, zone)) && zone) {
             zone = zone->next;
         }
 
-        return ptr_block;
+        return block;
     }
 
     return NULL;
@@ -50,47 +50,42 @@ t_zone *ft_create_zone(t_zone *previous_zone, int block_length_max, int block_nb
 }
 
 t_zone *ft_find_zone_from_block_in_specific_zone_type(t_zone *zone, t_block *block) {
-    t_zone *ptr_zone = zone;
-    t_block *ptr_block;
+    t_block *block_tmp;
 
-    while (ptr_zone) {
-        ptr_block = ptr_zone->blocks;
-        while (ptr_block) {
-            if (ptr_block == block) {
-                return ptr_zone;
+    while (zone) {
+        block_tmp = zone->blocks;
+        while (block_tmp) {
+            if (block_tmp == block) {
+                return zone;
             }
-            ptr_block = ptr_block->next;
+            block_tmp = block_tmp->next;
         }
-        ptr_zone = ptr_zone->next;
+        zone = zone->next;
     }
 
     return NULL;
 }
 
-t_zone *ft_find_zone_from_block(t_zone *zone, t_block *block) {
-    t_zone *ptr_zone = ft_find_zone_from_block_in_specific_zone_type(g_tiny_first_zone, block);
-    if (!ptr_zone)
-        ptr_zone = ft_find_zone_from_block_in_specific_zone_type(g_small_first_zone, block);
+t_zone *ft_find_zone_from_block(t_block *block) {
+    t_zone *zone = ft_find_zone_from_block_in_specific_zone_type(g_tiny_first_zone, block);
+    if (!zone)
+        zone = ft_find_zone_from_block_in_specific_zone_type(g_small_first_zone, block);
 
-    return ptr_zone;
+    return zone;
 }
 
 
 void ft_show_zone(t_zone *zone) {
-    printf("\n********** ft_show_zone ********** (zone = %p) \n", zone);
+    printf("\n================ ft_show_zone ================ [zone = %p] \n", zone);
 
     if (zone) {
         t_block *ptr;
-        // free_blocks
-        printf("****** blocks\n");
         ptr = zone->blocks;
         while (ptr) {
-            printf("----------------\n");
-            printf("previous = %p\n", ptr->previous);
-            printf("me = %p\n", ptr);
-            printf("size = %ld\n", ptr->size);
-            printf("free = %s\n", ptr->free ? "true" : "false");
-            printf("next = %p\n", ptr->next);
+            printf("----------------------------------------------\n");
+            printf("prev : %p%s\t free : %s\n", ptr->previous, ptr->previous ? "" : "\t", ptr->free ? "true" : "false");
+            printf("curr : %p%s\t size : %ld\tbits\n", ptr, ptr ? "" : "\t", ptr->size);
+            printf("next : %p\n", ptr->next);
             ptr = ptr->next;
         }
     } else {

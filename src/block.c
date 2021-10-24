@@ -4,10 +4,8 @@ t_block *ft_malloc_block(t_block *block, size_t size) {
     printf("\n********** ft_malloc_block **********\n");
     if (block) {
         if (block) {
-            printf("################### 1\n");
             block->free = false;
             if (block->size > size + sizeof(t_block)) {
-                printf("################### 2\n");
                 t_block *block_split = (void *)(block + 1) + size;
 
                 block_split->free = true;
@@ -51,7 +49,6 @@ inline void ft_merge_next_free_block(t_block *block) {
 
 void ft_destroy_block(t_block *block) {
     block -= 1;
-    t_zone *ptr_zone = ft_find_zone_from_block(g_tiny_first_zone, block);
 
     if (block->previous && block->next)
         if (block->previous->free) {

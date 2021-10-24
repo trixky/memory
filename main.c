@@ -3,7 +3,7 @@
 int main() {
     printf("sizeof(t_zone) = %ld\n", sizeof(t_zone));
     printf("sizeof(t_block) = %ld\n", sizeof(t_block));
-    printf("=========================================\n");
+    printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ STARt\n");
     // ft_malloc(257);
     ft_malloc(16);
     ft_malloc(200);
@@ -14,8 +14,6 @@ int main() {
     // ft_free(ptr);
     // ft_free(ptr2);
 
-    printf("=========================================\n");
     // ft_show_zone(g_small_first_zone);
     ft_show_zone(g_tiny_first_zone);
-    printf("=========================================\n");
 }
