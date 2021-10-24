@@ -1,8 +1,8 @@
 #include "./includes/memory_handler.h"
 
 int main() {
-    printf("sizeof(t_zone) = %ld\n", sizeof(t_zone));
-    printf("sizeof(t_block) = %ld\n", sizeof(t_block));
+    printf("STRUCT_ZONE_SIZE = %ld\n", STRUCT_ZONE_SIZE);
+    printf("STRUCT_BLOCK_SIZE = %ld\n", STRUCT_BLOCK_SIZE);
     printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ STARt\n");
     // ft_malloc(257);
     ft_malloc(16);

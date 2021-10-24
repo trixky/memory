@@ -15,13 +15,18 @@
 // errno
 #include <stdbool.h>
 
-#define ZONE_MIN_BLOCKS 100
+#define STRUCT_BLOCK_SIZE sizeof(t_block)
+#define STRUCT_ZONE_SIZE sizeof(t_zone)
+
+#define BLOCKS_PER_ZONE 100
 
 #define BLOCK_LENGTH_TINY_MIN	1
 #define BLOCK_LENGTH_TINY_MAX	256
 #define BLOCK_LENGTH_SMALL_MIN	(BLOCK_LENGTH_TINY_MAX + 1)
 #define BLOCK_LENGTH_SMALL_MAX	1024
 #define BLOCK_LENGTH_LARGE_MIN	(BLOCK_LENGTH_SMALL_MAX + 1)
+
+#define ZONE_SIZE(max_block_data_size) (STRUCT_ZONE_SIZE + BLOCKS_PER_ZONE * (STRUCT_BLOCK_SIZE + max_block_data_size))
 
 typedef struct				s_block
 {
@@ -55,7 +60,7 @@ void *ft_malloc(size_t size);
 void *ft_realloc(void *ptr, size_t size);
 // zone.c
 t_block *ft_find_the_optimal_free_block_in_zones(size_t size, t_zone *zone);
-t_zone *ft_create_zone(t_zone *previous_zone, int block_length_max, int block_nb);
+t_zone *ft_create_zone(t_zone *previous_zone, int max_block_data_size);
 t_zone *ft_find_zone_from_block(t_block *block);
 void ft_show_zone(t_zone *zone);
 // block.c

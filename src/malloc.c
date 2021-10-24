@@ -4,12 +4,12 @@
 t_block *ft_malloc_in_specific_zone_type(size_t size, t_zone **first_zone, t_zone **last_zone) {
     t_block *block;
     if (!*last_zone) {
-        *first_zone = ft_create_zone(NULL, BLOCK_LENGTH_TINY_MAX, ZONE_MIN_BLOCKS);
+        *first_zone = ft_create_zone(NULL, BLOCK_LENGTH_TINY_MAX);
         *last_zone = *first_zone;
     }
     block = ft_find_the_optimal_free_block_in_zones(size, *first_zone);
     if (!block) {
-        *last_zone = ft_create_zone(*last_zone, BLOCK_LENGTH_TINY_MAX, ZONE_MIN_BLOCKS);
+        *last_zone = ft_create_zone(*last_zone, BLOCK_LENGTH_TINY_MAX);
         block = ft_find_the_optimal_free_block_in_zones(size, *last_zone);
     }
 

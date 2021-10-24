@@ -31,22 +31,23 @@ t_block *ft_find_the_optimal_free_block_in_zones(size_t size, t_zone *zone) {
     return NULL;
 }
 
-t_zone *ft_create_zone(t_zone *previous_zone, int block_length_max, int block_nb) {
-    int zone_len = (block_length_max + sizeof(t_block)) * block_nb + sizeof(t_zone);
-    zone_len += getpagesize() - zone_len % getpagesize(); // up to the pagesize multiple
+t_zone *ft_create_zone(t_zone *previous_zone, int max_block_data_size) {
+    int zone_len = ZONE_SIZE(max_block_data_size);
+
+    zone_len += getpagesize() - zone_len % getpagesize();
     printf("\n********** ft_create_zone ********** (size = %d) pagesize %d\n", zone_len, getpagesize());
 
-    t_zone *new_zone = (t_zone *)mmap(0, zone_len, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+    t_zone *zone = (t_zone *)mmap(0, zone_len, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
 
-    new_zone->blocks = (t_block *)(new_zone + 1);
-    new_zone->blocks->free = true;
-    new_zone->blocks->size = zone_len - sizeof(t_zone) - sizeof(t_block);
-    new_zone->blocks->previous = NULL;
-    new_zone->blocks->next = NULL;
-    new_zone->previous = previous_zone;
-    new_zone->next = NULL;
+    zone->blocks = (t_block *)(zone + 1);
+    zone->blocks->free = true;
+    zone->blocks->size = zone_len - STRUCT_ZONE_SIZE - STRUCT_BLOCK_SIZE;
+    zone->blocks->previous = NULL;
+    zone->blocks->next = NULL;
+    zone->previous = previous_zone;
+    zone->next = NULL;
 
-    return new_zone;
+    return zone;
 }
 
 t_zone *ft_find_zone_from_block_in_specific_zone_type(t_zone *zone, t_block *block) {

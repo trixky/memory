@@ -5,11 +5,11 @@ t_block *ft_malloc_block(t_block *block, size_t size) {
     if (block) {
         if (block) {
             block->free = false;
-            if (block->size > size + sizeof(t_block)) {
+            if (block->size > size + STRUCT_BLOCK_SIZE) {
                 t_block *block_split = (void *)(block + 1) + size;
 
                 block_split->free = true;
-                block_split->size = block->size - sizeof(t_block) - size;
+                block_split->size = block->size - STRUCT_BLOCK_SIZE - size;
                 block_split->next = block->next;
                 block_split->previous = block;
                 block->size = size;
@@ -27,7 +27,7 @@ inline void ft_merge_surrounding_free_blocks(t_block *block) {
     if (block->next->next) {
         block->next->next->previous = block->previous;
     }
-    block->previous->size += sizeof(t_block) * 2 + block->size + block->next->size;
+    block->previous->size += STRUCT_BLOCK_SIZE * 2 + block->size + block->next->size;
     block->previous->next = block->next->next;
 }
 
@@ -35,7 +35,7 @@ inline void ft_merge_previous_free_block(t_block *block) {
     if (block->next) {
         block->next->previous = block->previous;
     }
-    block->previous->size += sizeof(t_block) + block->size;
+    block->previous->size += STRUCT_BLOCK_SIZE + block->size;
     block->previous->next = block->next;
 }
 
@@ -43,7 +43,7 @@ inline void ft_merge_next_free_block(t_block *block) {
     if (block->next->next) {
         block->next->next->previous = block;
     }
-    block->size += sizeof(t_block) + block->next->size;
+    block->size += STRUCT_BLOCK_SIZE + block->next->size;
     block->next = block->next->next;
 }
 
