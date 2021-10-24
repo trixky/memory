@@ -1,7 +1,6 @@
 #include "../includes/memory_handler.h"
 
 t_block *ft_malloc_block(t_block *block, size_t size) {
-    printf("\n********** ft_malloc_block **********\n");
     if (block) {
         if (block) {
             block->free = false;
@@ -48,8 +47,6 @@ inline void ft_merge_next_free_block(t_block *block) {
 }
 
 void ft_destroy_block(t_block *block) {
-    block -= 1;
-
     if (block->previous && block->next)
         if (block->previous->free) {
             if (block->next->free)
