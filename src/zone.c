@@ -31,26 +31,46 @@ t_block *ft_find_the_optimal_free_block_in_zones(size_t size, t_zone *zone) {
     return NULL;
 }
 
+t_block *ft_find_block_in_a_zone_from_ptr(void *ptr, t_zone *zone) {
+    if (ptr && zone) {
+        t_block *block = (t_block *)ptr - 1;
+        t_block *block_tmp = zone->blocks;
 
-// t_zone *ft_find_zone_from_a_pointer_in_specific_zone_type(void *ptr, t_zone *zone) {
-//     while (zone && ZONE_DATA_START_TINY(zone) >= ptr)
-// }
+        while (block_tmp != block && block_tmp)
+            block_tmp = block_tmp->next;
 
-t_zone *ft_find_zone_from_a_pointer(void *ptr) {
-    t_zone *zone = g_tiny_first_zone;
-    printf("******************************\n");
-    printf("******************************\n");
-    printf("******************************\n");
+        return block_tmp;
+    }
 
-    printf("zone = %p\n", zone);
-    printf("zone = %p\n", ZONE_DATA_START_TINY(zone));
-    printf("zone = %p\n", ZONE_DATA_END_TINY(zone));
+    return NULL;
 }
 
-t_zone *ft_create_zone(t_zone *previous_zone, int zone_size) {
+t_zone *ft_find_zone_from_a_pointer(void *ptr, int *zone_type) {
+    if (ptr) {
+        t_zone *zone = g_tiny_first_zone;
+
+        while (zone && (ptr < ZONE_DATA_START_TINY(zone) || ZONE_DATA_END_TINY(zone) < ptr))
+            zone = zone->next;
+        
+        if (!zone) {
+            zone = g_small_first_zone;
+            while (zone && (ZONE_DATA_START_SMALL(zone) < ptr || ptr < ZONE_DATA_END_SMALL(zone)))
+                zone = zone->next;
+            if (zone_type && zone)
+                *zone_type = SMALL;
+        }
+        else if (zone_type)
+            *zone_type = TINY;
+
+        return zone;
+    }
+    return NULL;
+}
+
+t_zone *ft_malloc_zone(t_zone *previous_zone, int zone_size) {
     t_zone *zone = (t_zone *)mmap(0, zone_size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
 
-    printf("********** ft_create_zone ********** [%p] size = %d\n", zone, zone_size);
+    printf("********** ft_malloc_zone ********** [%p] size = %d\n", zone, zone_size);
 
     zone->blocks = (t_block *)(zone + 1);
     zone->blocks->free = true;
@@ -61,6 +81,24 @@ t_zone *ft_create_zone(t_zone *previous_zone, int zone_size) {
     zone->next = NULL;
 
     return zone;
+}
+
+int ft_free_zone(t_zone *zone, int zone_type) {
+    if (zone->previous)
+        zone->previous->next = zone->next;
+    else if (zone_type == TINY)
+        g_tiny_first_zone = zone->next;
+    else
+        g_small_first_zone = zone->next;
+
+    if (zone->next)
+        zone->next->previous = zone->previous;
+    else if (zone_type == TINY)
+        g_tiny_last_zone = zone->previous;
+    else
+        g_small_last_zone = zone->previous;
+    
+    return munmap(zone, zone_type == TINY ? ZONE_TOTAL_SIZE_TINY : ZONE_TOTAL_SIZE_SMALL);
 }
 
 void ft_show_zone(t_zone *zone) {

@@ -1,5 +1,16 @@
 #include "../includes/memory_handler.h"
 
+inline void ft_split_block(t_block *block, size_t size) {
+    t_block *block_split = (void *)(block + 1) + size;
+
+    block_split->free = true;
+    block_split->size = block->size - STRUCT_BLOCK_SIZE - size;
+    block_split->next = block->next;
+    block_split->previous = block;
+    block->size = size;
+    block->next = block_split;
+}
+
 t_block *ft_malloc_block(t_block *block, size_t size) {
     if (block) {
         if (block) {
@@ -46,8 +57,8 @@ inline void ft_merge_next_free_block(t_block *block) {
     block->next = block->next->next;
 }
 
-void ft_destroy_block(t_block *block) {
-    if (block->previous && block->next)
+void ft_free_block(t_block *block) {
+    if (block->previous && block->next) {
         if (block->previous->free) {
             if (block->next->free)
                 merge_surrounding: ft_merge_surrounding_free_blocks(block);
@@ -57,6 +68,7 @@ void ft_destroy_block(t_block *block) {
         }
         else if (block->next->free)
             merge_next: ft_merge_next_free_block(block);
+    }
     else if (block->previous && block->previous->free)
         goto merge_previous;
     else if (block->next && block->next->free)
@@ -65,4 +77,13 @@ void ft_destroy_block(t_block *block) {
     block->free = true;
 
     skip_set_free: return ;
+}
+
+void ft_copy_block(t_block *block_src, t_block *block_dst) {
+    char *ptr_data_src = (char *)(block_src + 1);
+    char *ptr_data_dst = (char *)(block_dst + 1);
+
+    if (block_src && block_dst)
+        for (long int i = block_src->size < block_dst->size ? block_src->size : block_dst->size; i > 0; i--)
+            *(ptr_data_dst + i) = *(ptr_data_src + i);
 }

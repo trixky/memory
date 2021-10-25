@@ -72,12 +72,19 @@ void	*ft_malloc(size_t size);
 // ---------------------------------------------------------- realloc.c
 void	*ft_realloc(void *ptr, size_t size);
 // ---------------------------------------------------------- zone.c
-t_zone *ft_find_zone_from_a_pointer(void *ptr);
+t_zone	*ft_find_zone_from_a_pointer(void *ptr, int *zone_type);
 t_block	*ft_find_the_optimal_free_block_in_zones(size_t size, t_zone *zone);
-t_zone	*ft_create_zone(t_zone *previous_zone, int zone_len);
+t_block *ft_find_block_in_a_zone_from_ptr(void *ptr, t_zone *zone);
+t_zone	*ft_malloc_zone(t_zone *previous_zone, int zone_len);
+int 	ft_free_zone(t_zone *zone, int zone_type);
 void	ft_show_zones();
 // ---------------------------------------------------------- block.c
+void 	ft_split_block(t_block *block, size_t size);
 t_block	*ft_malloc_block(t_block *block, size_t size);
-void	ft_destroy_block(t_block *block);
+void 	ft_merge_surrounding_free_blocks(t_block *block);
+void 	ft_merge_previous_free_block(t_block *block);
+void 	ft_merge_next_free_block(t_block *block);
+void	ft_free_block(t_block *block);
+void 	ft_copy_block(t_block *block_src, t_block *block_dst);
 
 #endif
