@@ -1,5 +1,10 @@
 #include "../includes/memory_handler.h"
 
+void ft_copy_data(void *data_src, void *data_dst, size_t len) {
+    for (size_t i = 0; i < len; i++)
+        ((char *)data_dst)[i] = ((char *)data_src)[i];
+}
+
 void *ft_realloc(void *ptr, size_t size) {
     printf("\n********** realloc **********\n");
     if (ptr) {
@@ -9,55 +14,33 @@ void *ft_realloc(void *ptr, size_t size) {
         if (zone) {
             t_block *block = ft_find_block_in_a_zone_from_ptr(ptr, zone);
 
-            if (block) {
-                printf("$$$$$$$$$$$$$$$$$ passage 1\n");
-                if (size < block->size) {
-                    if (size + STRUCT_BLOCK_SIZE < block->size) {
-                        printf("$$$$$$$$$$$$$$$$$ passage 2\n");
-                        block->size = size;
+            if (block && block->size != size) {
+                if (size < block->size) { // plus petit
+                    if (size + STRUCT_BLOCK_SIZE < block->size) // plus petit | on split
                         ft_split_block(block, size);
-                    }
-                    else if (block->next && block->next->free) { // mettre ca dans block ?
-                        printf("$$$$$$$$$$$$$$$$$ passage 3\n");
-                        t_block block_next_copie = *(block->next);
-
-                        block->next = (void *)(block + 1) + size;
-                        block->next->free = true;
-                        block->next->size = block->size - size + block_next_copie.size;
-                        block->next->previous = block;
-                        block->next->next = block_next_copie.next;
-
-                        block->size = size;
-                    }
+                    else if (block->next && block->next->free) // plus petit | on split pas
+                        ft_shift_next_block(block, size);
                 }
-                else if (block->next && block->next->free && size < block->size + block->next->size + STRUCT_BLOCK_SIZE) {
-                    if (size < block->size + block->next->size) {
-                        printf("$$$$$$$$$$$$$$$$$ passage 4 (tested)\n");
-                    // ***** plus grand mais avec un block free suffisament grand derriere | on split
-                        t_block block_next_copie = *(block->next);
-                        block->next = (void *)(block + 1) + size;
-                        block->next->free = true;
-                        block->next->size = block_next_copie.size - (size - block->size);
-                        block->next->previous = block;
-                        block->next->next = block_next_copie.next;
-                        block->size = size;
-                    }
-                    else {
-                        printf("$$$$$$$$$$$$$$$$$ passage 5\n");
-                    // ***** plus grand mais avec un block free suffisament grand derriere | on split pas
-                        block->size += block->next->size + STRUCT_BLOCK_SIZE;
-                        if (block->next->next)
-                            block->next->next->previous = block;
-                        block->next = block->next->next;
-                    }
+                else if (block->next && block->next->free && size < block->size + block->next->size + STRUCT_BLOCK_SIZE) { // plus grand
+                    if (size < block->size + block->next->size) // on prend sur le next block free | on split
+                        ft_shift_next_block(block, size);
+                    else // on prend sur le next block free | on split pas
+                        ft_merge_next_free_block(block);
                 }
-                else {
-                        printf("$$$$$$$$$$$$$$$$$ passage 6\n");
-                // ***** plus grand et on trouve un autre block ailleur et on copie tout dessus et on free l'ancien
+                else { // trop grand
                     ptr = ft_malloc(size);
-                    ft_copy_block(block, (t_block *)ptr - 1);
+                    ft_copy_data(block + 1, ptr, block->size < size ? block->size : size);
                     ft_free_block(block);
                 }
+            }
+        }
+        else {
+            t_large *large = ft_find_large_from_a_pointer(ptr);
+
+            if (large && large->size != size) {
+                ptr = ft_malloc(size);
+                ft_copy_data(large + 1, ptr, large->size < size ? large->size : size);
+                ft_free_large(large);
             }
         }
 

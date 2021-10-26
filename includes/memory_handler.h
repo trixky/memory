@@ -20,8 +20,10 @@
 #define LARGE	2
 
 #define PAGESIZE getpagesize()
+
 #define STRUCT_BLOCK_SIZE	sizeof(t_block)
 #define STRUCT_ZONE_SIZE	sizeof(t_zone)
+#define STRUCT_LARGE_SIZE	sizeof(t_large)
 
 #define BLOCKS_PER_ZONE 3
 
@@ -45,17 +47,19 @@ typedef struct				s_block
 {
 	bool					free;
 	long int				size;
-	struct s_block*			previous;
+	struct s_block*			prev;
 	struct s_block*			next;
 }							t_block;
 
 typedef struct				s_zone {
 	t_block*				blocks;
-	struct s_zone*			previous;
+	struct s_zone*			prev;
 	struct s_zone*			next;
 }							t_zone;
 
 typedef struct				s_large {
+	long int				size;
+	struct s_large*			prev;
 	struct s_large*			next;
 }							t_large;
 
@@ -63,10 +67,13 @@ t_zone*						g_tiny_first_zone;
 t_zone*						g_tiny_last_zone;
 t_zone*						g_small_first_zone;
 t_zone*						g_small_last_zone;
-unsigned long long int		g_allowed_bytes;
+t_large*					g_larges;
 
 // ---------------------------------------------------------- free.c
 void	ft_free(void *ptr);
+// ---------------------------------------------------------- large.c
+t_large *ft_find_large_from_a_pointer(void *ptr);
+void ft_free_large(t_large *large);
 // ---------------------------------------------------------- malloc.c
 void	*ft_malloc(size_t size);
 // ---------------------------------------------------------- realloc.c
@@ -75,16 +82,16 @@ void	*ft_realloc(void *ptr, size_t size);
 t_zone	*ft_find_zone_from_a_pointer(void *ptr, int *zone_type);
 t_block	*ft_find_the_optimal_free_block_in_zones(size_t size, t_zone *zone);
 t_block *ft_find_block_in_a_zone_from_ptr(void *ptr, t_zone *zone);
-t_zone	*ft_malloc_zone(t_zone *previous_zone, int zone_len);
+t_zone	*ft_malloc_zone(t_zone *prev_zone, int zone_len);
 int 	ft_free_zone(t_zone *zone, int zone_type);
 void	ft_show_zones();
 // ---------------------------------------------------------- block.c
 void 	ft_split_block(t_block *block, size_t size);
+void 	ft_shift_next_block(t_block *block, size_t size);
 t_block	*ft_malloc_block(t_block *block, size_t size);
 void 	ft_merge_surrounding_free_blocks(t_block *block);
 void 	ft_merge_previous_free_block(t_block *block);
 void 	ft_merge_next_free_block(t_block *block);
 void	ft_free_block(t_block *block);
-void 	ft_copy_block(t_block *block_src, t_block *block_dst);
 
 #endif

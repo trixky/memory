@@ -8,6 +8,7 @@ RM = rm -f
 
 SRCS =	./src/block.c \
 		./src/free.c \
+		./src/large.c \
 		./src/malloc.c \
 		./src/realloc.c \
 		./src/zone.c

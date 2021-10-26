@@ -3,3 +3,4 @@
 * ? ptr, g_tiny_first_zone, g_tiny_last_zone = ft_malloc_zone(...);
 * attention au malloc 0 (actuellement on peut pas a cause d'un +1)
 * tout les size sont bien des long int ?
+* // ATTENTION --I OU i-1   (chercker le copi pour block et large)
