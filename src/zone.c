@@ -47,13 +47,13 @@ t_block *ft_find_block_in_a_zone_from_ptr(void *ptr, t_zone *zone) {
 
 t_zone *ft_find_zone_from_a_pointer(void *ptr, int *zone_type) {
     if (ptr) {
-        t_zone *zone = g_tiny_first_zone;
+        t_zone *zone = g_.g_tiny_first_zone;
 
         while (zone && (ptr < ZONE_DATA_START_TINY(zone) || ZONE_DATA_END_TINY(zone) < ptr))
             zone = zone->next;
         
         if (!zone) {
-            zone = g_small_first_zone;
+            zone = g_.g_small_first_zone;
             while (zone && (ZONE_DATA_START_SMALL(zone) < ptr || ptr < ZONE_DATA_END_SMALL(zone)))
                 zone = zone->next;
             if (zone_type && zone)
@@ -87,66 +87,16 @@ int ft_free_zone(t_zone *zone, int zone_type) {
     if (zone->prev)
         zone->prev->next = zone->next;
     else if (zone_type == TINY)
-        g_tiny_first_zone = zone->next;
+        g_.g_tiny_first_zone = zone->next;
     else
-        g_small_first_zone = zone->next;
+        g_.g_small_first_zone = zone->next;
 
     if (zone->next)
         zone->next->prev = zone->prev;
     else if (zone_type == TINY)
-        g_tiny_last_zone = zone->prev;
+        g_.g_tiny_last_zone = zone->prev;
     else
-        g_small_last_zone = zone->prev;
+        g_.g_small_last_zone = zone->prev;
     
     return munmap(zone, zone_type == TINY ? ZONE_TOTAL_SIZE_TINY : ZONE_TOTAL_SIZE_SMALL);
-}
-
-void ft_show_zone(t_zone *zone) {
-
-    if (zone) {
-        t_block *ptr;
-        ptr = zone->blocks;
-        while (ptr) {
-            printf("----------------------------------------------\n");
-            printf("prev : %p%s\t free : %s\n", ptr->prev, ptr->prev ? "" : "\t", ptr->free ? "true" : "false");
-            printf("curr : %p%s\t size : %ld\toctets\n", ptr, ptr ? "" : "\t", ptr->size);
-            printf("next : %p\n", ptr->next);
-            ptr = ptr->next;
-        }
-    } else {
-        printf("****** zone is nil\n");
-    }
-}
-
-void ft_show_large(t_large *large) {
-    printf("prev: %p%s\t curr: %p\tsize : %ld\tnext: %p\n", large->prev, large->prev ? "" : "\t", large, large->size, large->next);
-}
-
-void ft_show_zones() {
-    printf("\n===============================================\n");
-    printf("================ ft_show_zones ================\n");
-    printf("===============================================\n");
-	pthread_mutex_lock(&g_lock);		// LOCK
-    t_zone *zone = g_tiny_first_zone;
-    printf("\n================== tiny_zones =================\n");
-    while (zone) {
-        printf(">>>>>>>>>>>>>>>> zone %p\n", zone);
-        ft_show_zone(zone);
-        zone = zone->next;
-    }
-    printf("\n================= small_zones =================\n");
-    zone = g_small_first_zone;
-    while (zone) {
-        printf(">>>>>>>>>>>>>>>> zone %p\n", zone);
-        ft_show_zone(zone);
-        zone = zone->next;
-    }
-    printf("\n=================== larges ====================\n");
-    t_large *large = g_larges;
-    printf(">>>>>>>>>>>>>>>> larges %p\n", large);
-    while (large) {
-        ft_show_large(large);
-        large = large->next;
-    }
-	pthread_mutex_unlock(&g_lock);		// UNLOCK
 }
