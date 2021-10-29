@@ -1,6 +1,10 @@
 # binary
 a.out
 # library
-memory_handler.a
+*.a
+*.so
 # vsc
 .vscode
+# objects
+src/*.o
+src/*.d

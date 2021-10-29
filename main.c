@@ -1,4 +1,4 @@
-#include "./includes/memory_handler.h"
+#include "./includes/libft_malloc.h"
 #include <stdlib.h>
 
 int main() {
@@ -16,7 +16,6 @@ int main() {
     void *ptr5 = ft_malloc(1000);
     void *ptr6 = ft_malloc(398);
 
-    printf("eeeettt hooooo\n");
     void *ptrl1 = ft_malloc(20000);
     void *ptrl2 = ft_malloc(20020);
     void *ptrl3 = ft_malloc(20040);
@@ -33,5 +32,13 @@ int main() {
     ft_realloc(ptrl1, 9000);
     // ft_realloc(ptr6, 12000);
 
+    printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ft_show_zones\n");
+    printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ft_show_zones\n");
+    printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ft_show_zones\n");
     ft_show_zones();
+
+    printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ show_alloc_mem\n");
+    printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ show_alloc_mem\n");
+    printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ show_alloc_mem\n");
+    show_alloc_mem();
 }

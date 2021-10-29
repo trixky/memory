@@ -1,4 +1,4 @@
-#include "../includes/memory_handler.h"
+#include "../includes/libft_malloc.h"
 
 t_block *ft_find_the_optimal_free_block_in_zone(size_t size, t_zone *zone) {
     if (zone) {
@@ -109,7 +109,7 @@ void ft_show_zone(t_zone *zone) {
         while (ptr) {
             printf("----------------------------------------------\n");
             printf("prev : %p%s\t free : %s\n", ptr->prev, ptr->prev ? "" : "\t", ptr->free ? "true" : "false");
-            printf("curr : %p%s\t size : %ld\tbytes\n", ptr, ptr ? "" : "\t", ptr->size);
+            printf("curr : %p%s\t size : %ld\toctets\n", ptr, ptr ? "" : "\t", ptr->size);
             printf("next : %p\n", ptr->next);
             ptr = ptr->next;
         }
@@ -126,9 +126,9 @@ void ft_show_zones() {
     printf("\n===============================================\n");
     printf("================ ft_show_zones ================\n");
     printf("===============================================\n");
-    t_zone *zone;
+	pthread_mutex_lock(&g_lock);		// LOCK
+    t_zone *zone = g_tiny_first_zone;
     printf("\n================== tiny_zones =================\n");
-    zone = g_tiny_first_zone;
     while (zone) {
         printf(">>>>>>>>>>>>>>>> zone %p\n", zone);
         ft_show_zone(zone);
@@ -148,4 +148,5 @@ void ft_show_zones() {
         ft_show_large(large);
         large = large->next;
     }
+	pthread_mutex_unlock(&g_lock);		// UNLOCK
 }

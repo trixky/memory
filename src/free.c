@@ -1,8 +1,9 @@
-#include "../includes/memory_handler.h"
+#include "../includes/libft_malloc.h"
 
 void ft_free(void *ptr) {
     if (ptr) {
         int zone_type;
+        pthread_mutex_lock(&g_lock);        // LOCK
         t_zone *zone = ft_find_zone_from_a_pointer(ptr, &zone_type);
         if (zone) {
             t_block *block = ft_find_block_in_a_zone_from_ptr(ptr, zone);
@@ -17,5 +18,6 @@ void ft_free(void *ptr) {
             if (large)
                 ft_free_large(large);
         }
+        pthread_mutex_unlock(&g_lock);      // UNLOCK
     }
 }

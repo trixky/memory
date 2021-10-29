@@ -1,6 +1,9 @@
-#include "../includes/memory_handler.h"
+#include "../includes/libft_malloc.h"
+
+pthread_mutex_t g_lock = PTHREAD_MUTEX_INITIALIZER;
 
 void *ft_malloc_in_specific_zone_type(size_t size, t_zone **first_zone, t_zone **last_zone, int zone_size) {
+    pthread_mutex_lock(&g_lock);        // LOCK
     t_block *block;
 
     if (!*last_zone) {
@@ -13,8 +16,10 @@ void *ft_malloc_in_specific_zone_type(size_t size, t_zone **first_zone, t_zone *
         *last_zone = (*last_zone)->next;
         block = ft_find_the_optimal_free_block_in_zones(size, *last_zone);
     }
+    block = ft_malloc_block(block, size) + 1;
+    pthread_mutex_unlock(&g_lock);      // UNLOCK
 
-    return ft_malloc_block(block, size) + 1;
+    return block;
 }
 
 void *ft_malloc_out_of_zone(size_t size) {
@@ -22,6 +27,8 @@ void *ft_malloc_out_of_zone(size_t size) {
 
     large->size = size;
     large->prev = NULL;
+
+    pthread_mutex_lock(&g_lock);        // LOCK
 
     if (g_larges) {
         large->next = g_larges;
@@ -31,19 +38,15 @@ void *ft_malloc_out_of_zone(size_t size) {
         large->next = NULL;
     
     g_larges = large;
+    pthread_mutex_unlock(&g_lock);      // UNLOCK
 
     return large + 1;
 }
 
 void *ft_malloc(size_t size) {
-    if (size < BLOCK_LENGTH_SMALL_MIN) {
-        printf("chat 1\n");
+    if (size < BLOCK_LENGTH_SMALL_MIN)
         return ft_malloc_in_specific_zone_type(size, &g_tiny_first_zone, &g_tiny_last_zone, ZONE_TOTAL_SIZE_TINY);
-    }
-    else if (size < BLOCK_LENGTH_LARGE_MIN) {
-        printf("chat 2\n");
+    else if (size < BLOCK_LENGTH_LARGE_MIN)
         return ft_malloc_in_specific_zone_type(size, &g_small_first_zone, &g_small_last_zone, ZONE_TOTAL_SIZE_SMALL);
-    }
-    printf("chat 3\n");
     return ft_malloc_out_of_zone(size);
 }

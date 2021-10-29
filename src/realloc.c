@@ -1,4 +1,4 @@
-#include "../includes/memory_handler.h"
+#include "../includes/libft_malloc.h"
 
 void ft_copy_data(void *data_src, void *data_dst, size_t len) {
     for (size_t i = 0; i < len; i++)
@@ -6,8 +6,8 @@ void ft_copy_data(void *data_src, void *data_dst, size_t len) {
 }
 
 void *ft_realloc(void *ptr, size_t size) {
-    printf("\n********** realloc **********\n");
     if (ptr) {
+        pthread_mutex_lock(&g_lock);            // LOCK
         int zone_type;
         t_zone *zone = ft_find_zone_from_a_pointer(ptr, &zone_type);
 
@@ -43,6 +43,8 @@ void *ft_realloc(void *ptr, size_t size) {
                 ft_free_large(large);
             }
         }
+        pthread_mutex_unlock(&g_lock);          // UNLOCK
+
 
         return ptr;
     }

@@ -1,6 +1,13 @@
-LIBRARY_NAME = memory_handler.a
+ifeq ($(HOSTTYPE),)
+	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
+endif
+
+LIBRARY_NAME = libft_malloc
+LIBRARY_EXTENSION = .so
+LIBRARY = ${LIBRARY_NAME}_${LIBRARY_EXTENSION}
+DYNAMIC_LIBRARY = ${LIBRARY_NAME}_${HOSTTYPE}_${LIBRARY_EXTENSION}
 CC = gcc
-CFLAGS = -fPIC -O1
+CFLAGS = -fPIC
 # CFLAGS = -fPIC -Wall -Wextra -Werror
 LL = ar
 LFLAGS = -crs
@@ -11,13 +18,17 @@ SRCS =	./src/block.c \
 		./src/large.c \
 		./src/malloc.c \
 		./src/realloc.c \
+		./src/show.c \
 		./src/zone.c
 
 OBJS = $(SRCS:.c=.o)
 
-all: ${LIBRARY_NAME}
+all: ${LIBRARY}
 
-$(LIBRARY_NAME): $(OBJS)
+$(LIBRARY): $(DYNAMIC_LIBRARY)
+	@ln -sf $^ $@
+
+$(DYNAMIC_LIBRARY): $(OBJS)
 	$(LL) ${LFLAGS} -o $@ $^
 
 $(SRCS:.c=.d):%.d:%.c
@@ -25,12 +36,13 @@ $(SRCS:.c=.d):%.d:%.c
 
 include $(SRCS:.c=.d)
 
-re: clean fclean all
-
 clean:
 	-${RM} ${OBJS} $(SRCS:.c=.d)
 
 fclean: clean
-	-${RM} ${LIBRARY_NAME}
+	-${RM} ${LIBRARY}
+	-${RM} ${DYNAMIC_LIBRARY}
+
+re: clean fclean all
 
 .PHONY: all re clean
