@@ -31,7 +31,7 @@ t_block *ft_find_the_optimal_free_block_in_zones(size_t size, t_zone *zone) {
     return NULL;
 }
 
-t_block *ft_find_block_in_a_zone_from_ptr(void *ptr, t_zone *zone) {
+t_block *ft_find_block_in_a_zone_from_pointer(void *ptr, t_zone *zone) {
     if (ptr && zone) {
         t_block *block = (t_block *)ptr - 1;
         t_block *block_tmp = zone->blocks;
@@ -45,7 +45,7 @@ t_block *ft_find_block_in_a_zone_from_ptr(void *ptr, t_zone *zone) {
     return NULL;
 }
 
-t_zone *ft_find_zone_from_a_pointer(void *ptr, int *zone_type) {
+t_zone *ft_find_zone_from_pointer(void *ptr, int *zone_type) {
     if (ptr) {
         t_zone *zone = g_.g_tiny_first_zone;
 
@@ -69,8 +69,6 @@ t_zone *ft_find_zone_from_a_pointer(void *ptr, int *zone_type) {
 
 t_zone *ft_malloc_zone(t_zone *prev_zone, int zone_size) {
     t_zone *zone = (t_zone *)mmap(0, zone_size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
-
-    printf("********** ft_malloc_zone ********** [%p] size = %d\n", zone, zone_size);
 
     zone->blocks = (t_block *)(zone + 1);
     zone->blocks->free = true;

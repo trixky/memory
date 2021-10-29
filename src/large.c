@@ -1,6 +1,6 @@
 #include "../includes/libft_malloc.h"
 
-t_large *ft_find_large_from_a_pointer(void *ptr) {
+t_large *ft_find_large_from_pointer(void *ptr) {
     t_large *large = (t_large *)ptr - 1;
     t_large *large_tmp = g_.g_larges;
 

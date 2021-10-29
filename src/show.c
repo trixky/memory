@@ -1,16 +1,16 @@
 #include "../includes/libft_malloc.h"
 
-size_t			ft_strlen(const char *s)
+size_t			ft_strlen(const char *str)
 {
 	const char *ptr;
 
-	ptr = s;
+	ptr = str;
 	while (*ptr)
 		++ptr;
-	return (ptr - s);
+	return (ptr - str);
 }
 
-void			ft_putnbr(size_t n)
+void			ft_putnbr(size_t nbr)
 {
 	int				i;
 	char			str[12];
@@ -18,10 +18,10 @@ void			ft_putnbr(size_t n)
 	int				size;
 
 	size = 0;
-	nnbr = n;
+	nnbr = nbr;
 	while (nnbr)
 		nnbr /= 10 + 0 * size++;
-	nnbr = n;
+	nnbr = nbr;
 	if (!size)
 		str[size++] = '0';
 	str[size] = '\0';
@@ -34,7 +34,7 @@ void			ft_putnbr(size_t n)
 	write(STDOUT_FILENO, str, ft_strlen(str));
 }
 
-void			ft_puthexa(unsigned long n)
+void			ft_puthexa(unsigned long nbr)
 {
 	int				i;
 	char			str[20];
@@ -42,14 +42,14 @@ void			ft_puthexa(unsigned long n)
 	int				size;
 
 	size = 0;
-	nnbr = n;
-	while (n)
-		n /= 16 + 0 * size++;
+	nnbr = nbr;
+	while (nbr)
+		nbr /= 16 + 0 * size++;
 	if (!size)
 		str[size++] = '0';
 	str[size] = '\0';
 	i = size;
-	n = nnbr;
+	nbr = nnbr;
 	while (i--)
 	{
 		if (nnbr % 16 < 10)
@@ -63,28 +63,32 @@ void			ft_puthexa(unsigned long n)
 
 size_t		print_block(t_block *block)
 {
-	write(STDOUT_FILENO, "0x", 2);
-	ft_puthexa((unsigned long)block + STRUCT_BLOCK_SIZE);
-	write(STDOUT_FILENO, " - ", 3);
-	write(STDOUT_FILENO, "0x", 2);
-	ft_puthexa((unsigned long)block + STRUCT_BLOCK_SIZE + block->size);
-	write(STDOUT_FILENO, " : ", 3);
-	ft_putnbr(block->size);
-	write(STDOUT_FILENO, " octets\n", 8);
-	return (block->size);
+	if (block && !block->free) {
+		write(STDOUT_FILENO, "0x", 2);
+		ft_puthexa((unsigned long)block + STRUCT_BLOCK_SIZE);
+		write(STDOUT_FILENO, " - ", 3);
+		write(STDOUT_FILENO, "0x", 2);
+		ft_puthexa((unsigned long)block + STRUCT_BLOCK_SIZE + block->size);
+		write(STDOUT_FILENO, " : ", 3);
+		ft_putnbr(block->size);
+		write(STDOUT_FILENO, " octets\n", 8);
+		return (block->size);
+	}
 }
 
 size_t		print_large(t_large *large)
 {
-	write(STDOUT_FILENO, "0x", 2);
-	ft_puthexa((unsigned long)large + STRUCT_LARGE_SIZE);
-	write(STDOUT_FILENO, " - ", 3);
-	write(STDOUT_FILENO, "0x", 2);
-	ft_puthexa((unsigned long)large + STRUCT_LARGE_SIZE + large->size);
-	write(STDOUT_FILENO, " : ", 3);
-	ft_putnbr(large->size);
-	write(STDOUT_FILENO, " octets\n", 8);
-	return (large->size);
+	if (large) {
+		write(STDOUT_FILENO, "0x", 2);
+		ft_puthexa((unsigned long)large + STRUCT_LARGE_SIZE);
+		write(STDOUT_FILENO, " - ", 3);
+		write(STDOUT_FILENO, "0x", 2);
+		ft_puthexa((unsigned long)large + STRUCT_LARGE_SIZE + large->size);
+		write(STDOUT_FILENO, " : ", 3);
+		ft_putnbr(large->size);
+		write(STDOUT_FILENO, " octets\n", 8);
+		return (large->size);
+	}
 }
 
 size_t        ft_print_zones(int zone_type) {

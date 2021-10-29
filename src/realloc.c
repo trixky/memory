@@ -9,10 +9,10 @@ void *ft_realloc(void *ptr, size_t size) {
     if (ptr) {
         pthread_mutex_lock(&g_lock);            // LOCK
         int zone_type;
-        t_zone *zone = ft_find_zone_from_a_pointer(ptr, &zone_type);
+        t_zone *zone = ft_find_zone_from_pointer(ptr, &zone_type);
 
         if (zone) {
-            t_block *block = ft_find_block_in_a_zone_from_ptr(ptr, zone);
+            t_block *block = ft_find_block_in_a_zone_from_pointer(ptr, zone);
 
             if (block && block->size != size) {
                 if (size < block->size) { // plus petit
@@ -35,7 +35,7 @@ void *ft_realloc(void *ptr, size_t size) {
             }
         }
         else {
-            t_large *large = ft_find_large_from_a_pointer(ptr);
+            t_large *large = ft_find_large_from_pointer(ptr);
 
             if (large && large->size != size) {
                 ptr = ft_malloc(size);
