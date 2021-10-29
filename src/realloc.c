@@ -5,7 +5,7 @@ void ft_copy_data(void *data_src, void *data_dst, size_t len) {
         ((char *)data_dst)[i] = ((char *)data_src)[i];
 }
 
-void *ft_realloc(void *ptr, size_t size) {
+void *realloc(void *ptr, size_t size) {
     if (ptr) {
         pthread_mutex_lock(&g_lock);            // LOCK
         int zone_type;
@@ -28,7 +28,7 @@ void *ft_realloc(void *ptr, size_t size) {
                         ft_merge_next_free_block(block);
                 }
                 else { // trop grand
-                    ptr = ft_malloc(size);
+                    ptr = malloc(size);
                     ft_copy_data(block + 1, ptr, block->size < size ? block->size : size);
                     ft_free_block(block);
                 }
@@ -38,7 +38,7 @@ void *ft_realloc(void *ptr, size_t size) {
             t_large *large = ft_find_large_from_pointer(ptr);
 
             if (large && large->size != size) {
-                ptr = ft_malloc(size);
+                ptr = malloc(size);
                 ft_copy_data(large + 1, ptr, large->size < size ? large->size : size);
                 ft_free_large(large);
             }

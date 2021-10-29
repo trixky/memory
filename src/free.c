@@ -1,6 +1,6 @@
 #include "../includes/libft_malloc.h"
 
-void ft_free(void *ptr) {
+void free(void *ptr) {
     if (ptr) {
         int zone_type;
         pthread_mutex_lock(&g_lock);        // LOCK

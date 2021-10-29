@@ -43,7 +43,7 @@ void *ft_malloc_out_of_zone(size_t size) {
     return large + 1;
 }
 
-void *ft_malloc(size_t size) {
+void *malloc(size_t size) {
     if (size < BLOCK_LENGTH_SMALL_MIN)
         return ft_malloc_in_specific_zone_type(size, &g_.g_tiny_first_zone, &g_.g_tiny_last_zone, ZONE_TOTAL_SIZE_TINY);
     else if (size < BLOCK_LENGTH_LARGE_MIN)

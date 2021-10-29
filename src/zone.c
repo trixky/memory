@@ -54,7 +54,7 @@ t_zone *ft_find_zone_from_pointer(void *ptr, int *zone_type) {
         
         if (!zone) {
             zone = g_.g_small_first_zone;
-            while (zone && (ZONE_DATA_START_SMALL(zone) < ptr || ptr < ZONE_DATA_END_SMALL(zone)))
+                while (zone && (ptr < ZONE_DATA_START_SMALL(zone) || ZONE_DATA_END_SMALL(zone) < ptr))
                 zone = zone->next;
             if (zone_type && zone)
                 *zone_type = SMALL;

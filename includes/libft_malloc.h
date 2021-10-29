@@ -111,14 +111,14 @@ void 		ft_merge_previous_free_block(t_block *block);
 void 		ft_merge_next_free_block(t_block *block);
 void		ft_free_block(t_block *block);
 // ----------------------------------------- free.c
-void		ft_free(void *ptr);
+void		free(void *ptr);
 // ----------------------------------------- large.c
 t_large 	*ft_find_large_from_pointer(void *ptr);
 void 		ft_free_large(t_large *large);
 // ----------------------------------------- malloc.c
-void		*ft_malloc(size_t size);
+void		*malloc(size_t size);
 // ----------------------------------------- realloc.c
-void		*ft_realloc(void *ptr, size_t size);
+void		*realloc(void *ptr, size_t size);
 // ----------------------------------------- show.c
 void		show_alloc_mem(void);
 void		show_alloc_mem_ex(void);
