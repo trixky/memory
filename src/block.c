@@ -1,4 +1,4 @@
-#include "../includes/libft_malloc.h"
+#include "libft_malloc.h"
 
 inline void ft_split_block(t_block *block, size_t size) {
     t_block *block_split = (void *)(block + 1) + size;

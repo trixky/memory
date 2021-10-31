@@ -6,5 +6,4 @@ a.out
 # vsc
 .vscode
 # objects
-src/*.o
-src/*.d
+obj

@@ -1,4 +1,4 @@
-#include "../includes/libft_malloc.h"
+#include "libft_malloc.h"
 
 int main() {
     printf("sizeof(char) = %ld\n", sizeof(char));

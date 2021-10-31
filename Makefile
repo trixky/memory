@@ -4,40 +4,50 @@ endif
 
 LIBRARY_NAME = libft_malloc
 LIBRARY_EXTENSION = .so
-LIBRARY = ${LIBRARY_NAME}_${LIBRARY_EXTENSION}
-DYNAMIC_LIBRARY = ${LIBRARY_NAME}_${HOSTTYPE}_${LIBRARY_EXTENSION}
+LIBRARY = ${LIBRARY_NAME}${LIBRARY_EXTENSION}
+DYNAMIC_LIBRARY = ${LIBRARY_NAME}_${HOSTTYPE}${LIBRARY_EXTENSION}
+
 CC = gcc
-CFLAGS = -fPIC
-# CFLAGS = -fPIC -Wall -Wextra -Werror
-LL = ar
-LFLAGS = -crs
-RM = rm -f
+CCFLAGS = -fPIC # -Wall -Wextra -Werror
 
-SRCS =	./src/block.c \
-		./src/free.c \
-		./src/large.c \
-		./src/malloc.c \
-		./src/realloc.c \
-		./src/show.c \
-		./src/zone.c
+RM = rm -rf
 
-OBJS = $(SRCS:.c=.o)
+DIR_HEADERS 	= ./includes/
+DIR_SRCS 		= ./src/
+DIR_OBJS 		= ./obj/
+SUB_DIRS 		= .
+SUB_DIR_OBJS	=	$(SUB_DIRS:%=$(DIR_OBJS)%)
 
-all: ${LIBRARY}
+SRCS =	block.c \
+		free.c \
+		large.c \
+		malloc.c \
+		realloc.c \
+		show.c \
+		zone.c
+
+OBJS			=	$(SRCS:%.c=$(DIR_OBJS)%.o)
+
+all: $(LIBRARY)
 
 $(LIBRARY): $(DYNAMIC_LIBRARY)
-	@ln -sf $^ $@
+	@ln -sf $(DYNAMIC_LIBRARY) $(LIBRARY)
 
 $(DYNAMIC_LIBRARY): $(OBJS)
-	$(LL) ${LFLAGS} -o $@ $^
+	@$(CC) $(CCFLAGS) $(OBJS) -shared -o $(DYNAMIC_LIBRARY)
 
-$(SRCS:.c=.d):%.d:%.c
-	$(CC) $(CFLAGS) -MM $< >$@
+$(OBJS):		| $(DIR_OBJS)
 
-include $(SRCS:.c=.d)
+$(DIR_OBJS)%.o: $(DIR_SRCS)%.c
+	@$(CC) $(CCFLAGS) -I $(DIR_HEADERS) -c $< -o $@
+
+$(DIR_OBJS):	$(SUB_DIR_OBJS)
+
+$(SUB_DIR_OBJS):
+	@mkdir -p $(SUB_DIR_OBJS)
 
 clean:
-	-${RM} ${OBJS} $(SRCS:.c=.d)
+	-${RM} ${DIR_OBJS} $(SRCS:.c=.o)
 
 fclean: clean
 	-${RM} ${LIBRARY}
@@ -45,4 +55,4 @@ fclean: clean
 
 re: clean fclean all
 
-.PHONY: all re clean
+.PHONY: all clean fclean re

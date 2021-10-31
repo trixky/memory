@@ -1,4 +1,4 @@
-#include "../includes/libft_malloc.h"
+#include "libft_malloc.h"
 
 pthread_mutex_t g_lock = PTHREAD_MUTEX_INITIALIZER;
 

@@ -5,14 +5,9 @@
 // ================
 // =====
 
-#include <unistd.h> 		// getpagesize
+#include <unistd.h> 		// write | getpagesize
 #include <sys/mman.h> 		// mmap | munmap
-#include <sys/time.h> 		// getrlimit
-#include <sys/resource.h> 	// ^^^
 #include <pthread.h> 		// pthread_mutex_lock | pthread_mutex_unlock
-#include <unistd.h> 		// write
-#include <stdio.h> 			// printf
-#include <errno.h> 			// errno
 #include <stdbool.h> 		// boolean type
 
 // ========================================= DEFINES

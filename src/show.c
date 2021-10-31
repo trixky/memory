@@ -1,4 +1,11 @@
-#include "../includes/libft_malloc.h"
+#include "libft_malloc.h"
+
+/*
+// *************** //
+// **** BONUS **** //
+// *************** //
+#include <stdio.h>
+*/
 
 size_t			ft_strlen(const char *str)
 {
@@ -150,9 +157,37 @@ void		show_alloc_mem(void)
 	size_t		total = 0;
 
 	pthread_mutex_lock(&g_lock);		// LOCK
-    total += ft_print_zones(TINY);
-    total += ft_print_zones(SMALL);
-    total += ft_print_larges();
+
+	if ((void *)g_.g_tiny_first_zone < (void *)g_.g_small_first_zone && (void *)g_.g_small_first_zone < (void *)g_.g_larges) {
+		total += ft_print_zones(TINY);
+		total += ft_print_zones(SMALL);
+		total += ft_print_larges();
+	}
+	else if ((void *)g_.g_small_first_zone < (void *)g_.g_tiny_first_zone && (void *)g_.g_small_first_zone < (void *)g_.g_larges) {
+		total += ft_print_zones(SMALL);
+		total += ft_print_zones(TINY);
+		total += ft_print_larges();
+	}
+	else if ((void *)g_.g_larges < (void *)g_.g_small_first_zone && (void *)g_.g_small_first_zone < (void *)g_.g_tiny_first_zone) {
+		total += ft_print_larges();
+		total += ft_print_zones(SMALL);
+		total += ft_print_zones(TINY);
+	}
+	else if ((void *)g_.g_larges < (void *)g_.g_small_first_zone && (void *)g_.g_tiny_first_zone < (void *)g_.g_small_first_zone) {
+		total += ft_print_larges();
+		total += ft_print_zones(TINY);
+		total += ft_print_zones(SMALL);
+	}
+	else if ((void *)g_.g_tiny_first_zone < (void *)g_.g_larges && (void *)g_.g_larges < (void *)g_.g_small_first_zone) {
+		total += ft_print_zones(TINY);
+		total += ft_print_larges();
+		total += ft_print_zones(SMALL);
+	} 
+	else if ((void *)g_.g_small_first_zone < (void *)g_.g_larges && (void *)g_.g_larges < (void *)g_.g_tiny_first_zone) {
+		total += ft_print_zones(SMALL);
+		total += ft_print_larges();
+		total += ft_print_zones(TINY);
+	} 
 
 	write(STDOUT_FILENO, "Total : ", 8);
 	ft_putnbr(total);
@@ -160,6 +195,11 @@ void		show_alloc_mem(void)
 	pthread_mutex_unlock(&g_lock);		// UNLOCK
 }
 
+/*
+
+// *************** //
+// **** BONUS **** //
+// *************** //
 void ft_show_zone(t_zone *zone) {
     if (zone) {
         t_block *block;
@@ -169,14 +209,15 @@ void ft_show_zone(t_zone *zone) {
             printf("         prev : %p\n", block->prev);
             printf("         free : %s\t%s: " ANSI_COLOR_GREEN "%ld\n" ANSI_COLOR_RESET, block->free ? ANSI_COLOR_BLUE "true" ANSI_COLOR_RESET: ANSI_COLOR_RED "false" ANSI_COLOR_RESET, block->size != 0 ? "bytes" : "byte", block->size);
             printf("         next : %p\n", block->next);
-
-
             block = block->next;
         }
 		printf("\n");
     }
 }
 
+// *************** //
+// **** BONUS **** //
+// *************** //
 void ft_show_large(t_large *large) {
 	if (large) {
 		printf(ANSI_COLOR_YELLOW "      block " ANSI_COLOR_RESET "%p :\n" , large);
@@ -186,6 +227,9 @@ void ft_show_large(t_large *large) {
 	}
 }
 
+// *************** //
+// **** BONUS **** //
+// *************** //
 void show_alloc_mem_ex(void) {
 	pthread_mutex_lock(&g_lock);		// LOCK
     printf("\n===============================================\n");
@@ -219,3 +263,5 @@ void show_alloc_mem_ex(void) {
 	}
 	pthread_mutex_unlock(&g_lock);		// UNLOCK
 }
+
+*/

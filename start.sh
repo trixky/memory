@@ -1,6 +1,8 @@
+#!/bin/sh 
+
 LIBRARY_NAME=libft_malloc
 LIBRARY_EXTENSION=.so
-LIBRARY=${LIBRARY_NAME}_${LIBRARY_EXTENSION}
+LIBRARY=${LIBRARY_NAME}${LIBRARY_EXTENSION}
 
 if [ -z "$1" ]
 then
@@ -11,6 +13,5 @@ fi
 make re
 
 gcc ./tests/$1 $LIBRARY
-make clean
 echo "\n------------------------ exec a.out :"
-/usr/bin/time -v ./a.out
+LD_LIBRARY_PATH=. LD_PRELOAD=libft_malloc.so /usr/bin/time -v ./a.out
