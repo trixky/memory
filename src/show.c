@@ -158,32 +158,32 @@ void		show_alloc_mem(void)
 
 	pthread_mutex_lock(&g_lock);		// LOCK
 
-	if ((void *)g_.g_tiny_first_zone < (void *)g_.g_small_first_zone && (void *)g_.g_small_first_zone < (void *)g_.g_larges) {
+	if ((void *)g_.g_tiny_first_zone <= (void *)g_.g_small_first_zone && (void *)g_.g_small_first_zone <= (void *)g_.g_larges) {
 		total += ft_print_zones(TINY);
 		total += ft_print_zones(SMALL);
 		total += ft_print_larges();
 	}
-	else if ((void *)g_.g_small_first_zone < (void *)g_.g_tiny_first_zone && (void *)g_.g_small_first_zone < (void *)g_.g_larges) {
+	else if ((void *)g_.g_small_first_zone <= (void *)g_.g_tiny_first_zone && (void *)g_.g_tiny_first_zone <= (void *)g_.g_larges) {
 		total += ft_print_zones(SMALL);
 		total += ft_print_zones(TINY);
 		total += ft_print_larges();
 	}
-	else if ((void *)g_.g_larges < (void *)g_.g_small_first_zone && (void *)g_.g_small_first_zone < (void *)g_.g_tiny_first_zone) {
+	else if ((void *)g_.g_larges <= (void *)g_.g_small_first_zone && (void *)g_.g_small_first_zone <= (void *)g_.g_tiny_first_zone) {
 		total += ft_print_larges();
 		total += ft_print_zones(SMALL);
 		total += ft_print_zones(TINY);
 	}
-	else if ((void *)g_.g_larges < (void *)g_.g_small_first_zone && (void *)g_.g_tiny_first_zone < (void *)g_.g_small_first_zone) {
+	else if ((void *)g_.g_larges <= (void *)g_.g_tiny_first_zone && (void *)g_.g_tiny_first_zone <= (void *)g_.g_small_first_zone) {
 		total += ft_print_larges();
 		total += ft_print_zones(TINY);
 		total += ft_print_zones(SMALL);
 	}
-	else if ((void *)g_.g_tiny_first_zone < (void *)g_.g_larges && (void *)g_.g_larges < (void *)g_.g_small_first_zone) {
+	else if ((void *)g_.g_tiny_first_zone <= (void *)g_.g_larges && (void *)g_.g_larges <= (void *)g_.g_small_first_zone) {
 		total += ft_print_zones(TINY);
 		total += ft_print_larges();
 		total += ft_print_zones(SMALL);
 	} 
-	else if ((void *)g_.g_small_first_zone < (void *)g_.g_larges && (void *)g_.g_larges < (void *)g_.g_tiny_first_zone) {
+	else if ((void *)g_.g_small_first_zone <= (void *)g_.g_larges && (void *)g_.g_larges <= (void *)g_.g_tiny_first_zone) {
 		total += ft_print_zones(SMALL);
 		total += ft_print_larges();
 		total += ft_print_zones(TINY);
@@ -196,7 +196,6 @@ void		show_alloc_mem(void)
 }
 
 /*
-
 // *************** //
 // **** BONUS **** //
 // *************** //
@@ -263,5 +262,4 @@ void show_alloc_mem_ex(void) {
 	}
 	pthread_mutex_unlock(&g_lock);		// UNLOCK
 }
-
 */

@@ -1,6 +1,7 @@
 #include "libft_malloc.h"
 
 void free(void *ptr) {
+
     if (ptr) {
         int zone_type;
         pthread_mutex_lock(&g_lock);        // LOCK
@@ -9,7 +10,7 @@ void free(void *ptr) {
             t_block *block = ft_find_block_in_a_zone_from_pointer(ptr, zone);
             if (block) {
                 ft_free_block(block);
-                if (zone->blocks && !zone->blocks->next && zone->blocks->free)
+                if ((zone->prev || zone->next) && zone->blocks && !zone->blocks->next && zone->blocks->free)
                     ft_free_zone(zone, zone_type);
             }
         }
