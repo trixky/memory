@@ -81,11 +81,17 @@ size_t		print_block(t_block *block)
 		write(STDOUT_FILENO, " octets\n", 8);
 		return (block->size);
 	}
+
+	return 0;
 }
 
-size_t		print_large(t_large *large)
+size_t		ft_print_large(t_large *large)
 {
 	if (large) {
+		write(STDOUT_FILENO, "LARGE : 0x", 10);
+		ft_puthexa((unsigned long)large + STRUCT_ZONE_SIZE);
+		write(STDOUT_FILENO, "\n", 1);
+
 		write(STDOUT_FILENO, "0x", 2);
 		ft_puthexa((unsigned long)large + STRUCT_LARGE_SIZE);
 		write(STDOUT_FILENO, " - ", 3);
@@ -96,60 +102,68 @@ size_t		print_large(t_large *large)
 		write(STDOUT_FILENO, " octets\n", 8);
 		return (large->size);
 	}
+
+	return 0;
 }
 
-size_t        ft_print_zones(int zone_type) {
+size_t        ft_print_zone(t_zone *zone, int zone_type) {
     size_t      size = 0;
 	t_block		*block;
 
-	t_zone *zone;
-	char *header;
-	size_t header_size;
+	if (zone_type == TINY)
+		write(STDOUT_FILENO, "TINY : 0x", 9);
+	else 
+		write(STDOUT_FILENO, "SMALL : 0x", 10);
 
-	if (zone_type == TINY) {
-		zone = g_.g_tiny_first_zone;
-		header = "TINY : 0x";
-		header_size = 9;
-	}
-	else {
-		zone = g_.g_small_first_zone;
-		header = "SMALL : 0x";
-		header_size = 10;
-	}
+	ft_puthexa((unsigned long)zone + STRUCT_ZONE_SIZE);
+	write(STDOUT_FILENO, "\n", 1);
 
-	while (zone) {
-		write(STDOUT_FILENO, header, header_size);
-		ft_puthexa((unsigned long)zone + STRUCT_ZONE_SIZE);
-		write(STDOUT_FILENO, "\n", 1);
-
-		block = zone->blocks;
-		while (block)
-		{
-			size += print_block(block);
-			block = block->next;
-		}
-
-		zone = zone->next;
+	block = zone->blocks;
+	while (block)
+	{
+		size += print_block(block);
+		block = block->next;
 	}
     
     return size;
 }
 
-size_t		ft_print_larges(void) {
-	size_t size = 0;
-	t_large *large = g_.g_larges;
+void		*ft_find_next_zone_or_large(void *ptr, int *type) {
+	t_zone	*zone;
+	t_large	*large;
+	void	*best = NULL;
 
+	// ------------------ search in tiny
+	zone = g_.g_tiny_first_zone;
+	while (zone) {
+		if ((void *)zone > ptr && ((void *)zone < best || best == NULL)) {
+			*type = TINY;
+			best = (void *)zone;
+		}
+		zone = zone->next;
+	}
+
+	// ------------------ search in small
+	zone = g_.g_small_first_zone;
+	while (zone) {
+		if ((void *)zone > ptr && ((void *)zone < best || best == NULL)) {
+			*type = SMALL;
+			best = (void *)zone;
+		}
+		zone = zone->next;
+	}
+
+	// ------------------ search in large
+	large = g_.g_larges;
 	while (large) {
-		write(STDOUT_FILENO, "LARGE : 0x", 10);
-		ft_puthexa((unsigned long)large + STRUCT_ZONE_SIZE);
-		write(STDOUT_FILENO, "\n", 1);
-
-		size += print_large(large);
-
+		if ((void *)large > ptr && ((void *)large < best || best == NULL)) {
+			*type = LARGE;
+			best = (void *)large;
+		}
 		large = large->next;
 	}
 
-	return size;
+	return best;
 }
 
 void		show_alloc_mem(void)
@@ -158,36 +172,15 @@ void		show_alloc_mem(void)
 
 	pthread_mutex_lock(&g_lock);		// LOCK
 
-	if ((void *)g_.g_tiny_first_zone <= (void *)g_.g_small_first_zone && (void *)g_.g_small_first_zone <= (void *)g_.g_larges) {
-		total += ft_print_zones(TINY);
-		total += ft_print_zones(SMALL);
-		total += ft_print_larges();
+	void	*zone_or_large = NULL;
+	int		zone_type;
+
+	while ((zone_or_large = ft_find_next_zone_or_large(zone_or_large, &zone_type))) {
+		if (zone_type != LARGE)
+			total += ft_print_zone((t_zone *)zone_or_large, zone_type);
+		else
+			total += ft_print_large((t_large *)zone_or_large);
 	}
-	else if ((void *)g_.g_small_first_zone <= (void *)g_.g_tiny_first_zone && (void *)g_.g_tiny_first_zone <= (void *)g_.g_larges) {
-		total += ft_print_zones(SMALL);
-		total += ft_print_zones(TINY);
-		total += ft_print_larges();
-	}
-	else if ((void *)g_.g_larges <= (void *)g_.g_small_first_zone && (void *)g_.g_small_first_zone <= (void *)g_.g_tiny_first_zone) {
-		total += ft_print_larges();
-		total += ft_print_zones(SMALL);
-		total += ft_print_zones(TINY);
-	}
-	else if ((void *)g_.g_larges <= (void *)g_.g_tiny_first_zone && (void *)g_.g_tiny_first_zone <= (void *)g_.g_small_first_zone) {
-		total += ft_print_larges();
-		total += ft_print_zones(TINY);
-		total += ft_print_zones(SMALL);
-	}
-	else if ((void *)g_.g_tiny_first_zone <= (void *)g_.g_larges && (void *)g_.g_larges <= (void *)g_.g_small_first_zone) {
-		total += ft_print_zones(TINY);
-		total += ft_print_larges();
-		total += ft_print_zones(SMALL);
-	} 
-	else if ((void *)g_.g_small_first_zone <= (void *)g_.g_larges && (void *)g_.g_larges <= (void *)g_.g_tiny_first_zone) {
-		total += ft_print_zones(SMALL);
-		total += ft_print_larges();
-		total += ft_print_zones(TINY);
-	} 
 
 	write(STDOUT_FILENO, "Total : ", 8);
 	ft_putnbr(total);

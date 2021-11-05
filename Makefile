@@ -8,7 +8,7 @@ LIBRARY = ${LIBRARY_NAME}${LIBRARY_EXTENSION}
 DYNAMIC_LIBRARY = ${LIBRARY_NAME}_${HOSTTYPE}${LIBRARY_EXTENSION}
 
 CC = gcc
-CCFLAGS = -fPIC # -Wall -Wextra -Werror
+CCFLAGS = -fPIC -Wall -Wextra -Werror
 
 RM = rm -rf
 

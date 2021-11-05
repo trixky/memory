@@ -53,10 +53,9 @@ void *ft_realloc_in_larges(void *ptr, size_t size) {
 }
 
 void *realloc(void *ptr, size_t size) {
-    void *new_ptr = ft_realloc_in_zones(ptr, size);
-    if (!new_ptr)
-        new_ptr = ft_realloc_in_larges(ptr, size);
-    if (!new_ptr)
-        new_ptr = malloc(size);
-    return new_ptr;
+    if (ptr) {
+        void *new_ptr = ft_realloc_in_zones(ptr, size);
+        return new_ptr != NULL ? new_ptr : ft_realloc_in_larges(ptr, size);
+    }
+    return malloc(size);
 }

@@ -1,5 +1,6 @@
 #include "libft_malloc.h"
 
+t_global        g_;
 pthread_mutex_t g_lock = PTHREAD_MUTEX_INITIALIZER;
 
 void *ft_malloc_in_specific_zone_type(size_t size, t_zone **first_zone, t_zone **last_zone, int zone_size) {
