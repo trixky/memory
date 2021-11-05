@@ -47,13 +47,13 @@ t_block *ft_find_block_in_a_zone_from_pointer(void *ptr, t_zone *zone) {
 
 t_zone *ft_find_zone_from_pointer(void *ptr, int *zone_type) {
     if (ptr) {
-        t_zone *zone = g_.g_tiny_first_zone;
+        t_zone *zone = g_.tiny_first_zone;
 
         while (zone && (ptr < ZONE_DATA_START_TINY(zone) || ZONE_DATA_END_TINY(zone) < ptr))
             zone = zone->next;
         
         if (!zone) {
-            zone = g_.g_small_first_zone;
+            zone = g_.small_first_zone;
                 while (zone && (ptr < ZONE_DATA_START_SMALL(zone) || ZONE_DATA_END_SMALL(zone) < ptr))
                 zone = zone->next;
             if (zone_type && zone)
@@ -85,16 +85,16 @@ int ft_free_zone(t_zone *zone, int zone_type) {
     if (zone->prev)
         zone->prev->next = zone->next;
     else if (zone_type == TINY)
-        g_.g_tiny_first_zone = zone->next;
+        g_.tiny_first_zone = zone->next;
     else
-        g_.g_small_first_zone = zone->next;
+        g_.small_first_zone = zone->next;
 
     if (zone->next)
         zone->next->prev = zone->prev;
     else if (zone_type == TINY)
-        g_.g_tiny_last_zone = zone->prev;
+        g_.tiny_last_zone = zone->prev;
     else
-        g_.g_small_last_zone = zone->prev;
+        g_.small_last_zone = zone->prev;
     
     return munmap(zone, zone_type == TINY ? ZONE_TOTAL_SIZE_TINY : ZONE_TOTAL_SIZE_SMALL);
 }

@@ -31,14 +31,14 @@ void *ft_malloc_out_of_zone(size_t size) {
 
     pthread_mutex_lock(&g_lock);        // LOCK
 
-    if (g_.g_larges) {
-        large->next = g_.g_larges;
+    if (g_.larges) {
+        large->next = g_.larges;
         large->next->prev = large;
     }
     else
         large->next = NULL;
     
-    g_.g_larges = large;
+    g_.larges = large;
     pthread_mutex_unlock(&g_lock);      // UNLOCK
 
     return large + 1;
@@ -46,8 +46,8 @@ void *ft_malloc_out_of_zone(size_t size) {
 
 void *malloc(size_t size) {
     if (size < BLOCK_LENGTH_SMALL_MIN)
-        return ft_malloc_in_specific_zone_type(size, &g_.g_tiny_first_zone, &g_.g_tiny_last_zone, ZONE_TOTAL_SIZE_TINY);
+        return ft_malloc_in_specific_zone_type(size, &g_.tiny_first_zone, &g_.tiny_last_zone, ZONE_TOTAL_SIZE_TINY);
     else if (size < BLOCK_LENGTH_LARGE_MIN)
-        return ft_malloc_in_specific_zone_type(size, &g_.g_small_first_zone, &g_.g_small_last_zone, ZONE_TOTAL_SIZE_SMALL);
+        return ft_malloc_in_specific_zone_type(size, &g_.small_first_zone, &g_.small_last_zone, ZONE_TOTAL_SIZE_SMALL);
     return ft_malloc_out_of_zone(size);
 }

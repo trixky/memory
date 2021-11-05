@@ -69,11 +69,11 @@ typedef struct				s_large {
 }							t_large;
 
 typedef struct				s_gloabl {
-	t_zone*						g_tiny_first_zone;
-	t_zone*						g_tiny_last_zone;
-	t_zone*						g_small_first_zone;
-	t_zone*						g_small_last_zone;
-	t_large*					g_larges;
+	t_zone*					tiny_first_zone;
+	t_zone*					tiny_last_zone;
+	t_zone*					small_first_zone;
+	t_zone*					small_last_zone;
+	t_large*				larges;
 }							t_global;
 
 // ========================================= GLOBALS

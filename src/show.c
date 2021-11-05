@@ -68,7 +68,7 @@ void			ft_puthexa(unsigned long nbr)
 	write(STDOUT_FILENO, str, ft_strlen(str));
 }
 
-size_t		print_block(t_block *block)
+size_t		ft_print_block(t_block *block)
 {
 	if (block && !block->free) {
 		write(STDOUT_FILENO, "0x", 2);
@@ -121,7 +121,7 @@ size_t        ft_print_zone(t_zone *zone, int zone_type) {
 	block = zone->blocks;
 	while (block)
 	{
-		size += print_block(block);
+		size += ft_print_block(block);
 		block = block->next;
 	}
     
@@ -134,7 +134,7 @@ void		*ft_find_next_zone_or_large(void *ptr, int *type) {
 	void	*best = NULL;
 
 	// ------------------ search in tiny
-	zone = g_.g_tiny_first_zone;
+	zone = g_.tiny_first_zone;
 	while (zone) {
 		if ((void *)zone > ptr && ((void *)zone < best || best == NULL)) {
 			*type = TINY;
@@ -144,7 +144,7 @@ void		*ft_find_next_zone_or_large(void *ptr, int *type) {
 	}
 
 	// ------------------ search in small
-	zone = g_.g_small_first_zone;
+	zone = g_.small_first_zone;
 	while (zone) {
 		if ((void *)zone > ptr && ((void *)zone < best || best == NULL)) {
 			*type = SMALL;
@@ -154,7 +154,7 @@ void		*ft_find_next_zone_or_large(void *ptr, int *type) {
 	}
 
 	// ------------------ search in large
-	large = g_.g_larges;
+	large = g_.larges;
 	while (large) {
 		if ((void *)large > ptr && ((void *)large < best || best == NULL)) {
 			*type = LARGE;
@@ -227,7 +227,7 @@ void show_alloc_mem_ex(void) {
     printf("\n===============================================\n");
     printf("============== show_alloc_mem_ex ==============\n");
     printf("===============================================\n\n");
-    t_zone *zone = g_.g_tiny_first_zone;
+    t_zone *zone = g_.tiny_first_zone;
 	if (zone) {
 		printf(ANSI_COLOR_YELLOW "tiny" ANSI_COLOR_RESET " :\n");
 		while (zone) {
@@ -236,7 +236,7 @@ void show_alloc_mem_ex(void) {
 			zone = zone->next;
 		}
 	}
-    zone = g_.g_small_first_zone;
+    zone = g_.small_first_zone;
 	if (zone) {
     	printf(ANSI_COLOR_YELLOW "small" ANSI_COLOR_RESET " :\n");
 		while (zone) {
@@ -245,7 +245,7 @@ void show_alloc_mem_ex(void) {
 			zone = zone->next;
 		}
 	}
-    t_large *large = g_.g_larges;
+    t_large *large = g_.larges;
 	if (large) {
 		printf(ANSI_COLOR_YELLOW "large" ANSI_COLOR_RESET " :\n");
 		while (large) {
