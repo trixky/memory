@@ -20,6 +20,7 @@ SUB_DIR_OBJS	=	$(SUB_DIRS:%=$(DIR_OBJS)%)
 
 SRCS =	block.c \
 		free.c \
+		history.c \
 		large.c \
 		malloc.c \
 		realloc.c \

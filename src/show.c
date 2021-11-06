@@ -1,12 +1,5 @@
 #include "libft_malloc.h"
 
-/*
-// *************** //
-// **** BONUS **** //
-// *************** //
-#include <stdio.h>
-*/
-
 size_t			ft_strlen(const char *str)
 {
 	const char *ptr;
@@ -68,14 +61,22 @@ void			ft_puthexa(unsigned long nbr)
 	write(STDOUT_FILENO, str, ft_strlen(str));
 }
 
+void		ft_putaddress(unsigned long nbr) {
+	if (nbr == 0) {
+		write(STDOUT_FILENO, "nil", 3);
+	}
+	else {
+		write(STDOUT_FILENO, "0x", 2);
+		ft_puthexa(nbr);
+	}
+}
+
 size_t		ft_print_block(t_block *block)
 {
 	if (block && !block->free) {
-		write(STDOUT_FILENO, "0x", 2);
-		ft_puthexa((unsigned long)block + STRUCT_BLOCK_SIZE);
+		ft_putaddress((unsigned long)block + STRUCT_BLOCK_SIZE);
 		write(STDOUT_FILENO, " - ", 3);
-		write(STDOUT_FILENO, "0x", 2);
-		ft_puthexa((unsigned long)block + STRUCT_BLOCK_SIZE + block->size);
+		ft_putaddress((unsigned long)block + STRUCT_BLOCK_SIZE + block->size);
 		write(STDOUT_FILENO, " : ", 3);
 		ft_putnbr(block->size);
 		write(STDOUT_FILENO, " octets\n", 8);
@@ -88,15 +89,13 @@ size_t		ft_print_block(t_block *block)
 size_t		ft_print_large(t_large *large)
 {
 	if (large) {
-		write(STDOUT_FILENO, "LARGE : 0x", 10);
-		ft_puthexa((unsigned long)large + STRUCT_ZONE_SIZE);
+		write(STDOUT_FILENO, "LARGE : ", 8);
+		ft_putaddress((unsigned long)large + STRUCT_ZONE_SIZE);
 		write(STDOUT_FILENO, "\n", 1);
 
-		write(STDOUT_FILENO, "0x", 2);
-		ft_puthexa((unsigned long)large + STRUCT_LARGE_SIZE);
+		ft_putaddress((unsigned long)large + STRUCT_LARGE_SIZE);
 		write(STDOUT_FILENO, " - ", 3);
-		write(STDOUT_FILENO, "0x", 2);
-		ft_puthexa((unsigned long)large + STRUCT_LARGE_SIZE + large->size);
+		ft_putaddress((unsigned long)large + STRUCT_LARGE_SIZE + large->size);
 		write(STDOUT_FILENO, " : ", 3);
 		ft_putnbr(large->size);
 		write(STDOUT_FILENO, " octets\n", 8);
@@ -111,11 +110,11 @@ size_t        ft_print_zone(t_zone *zone, int zone_type) {
 	t_block		*block;
 
 	if (zone_type == TINY)
-		write(STDOUT_FILENO, "TINY : 0x", 9);
+		write(STDOUT_FILENO, "TINY : ", 7);
 	else 
-		write(STDOUT_FILENO, "SMALL : 0x", 10);
+		write(STDOUT_FILENO, "SMALL : ", 8);
 
-	ft_puthexa((unsigned long)zone + STRUCT_ZONE_SIZE);
+	ft_putaddress((unsigned long)zone + STRUCT_ZONE_SIZE);
 	write(STDOUT_FILENO, "\n", 1);
 
 	block = zone->blocks;
@@ -133,7 +132,6 @@ void		*ft_find_next_zone_or_large(void *ptr, int *type) {
 	t_large	*large;
 	void	*best = NULL;
 
-	// ------------------ search in tiny
 	zone = g_.tiny_first_zone;
 	while (zone) {
 		if ((void *)zone > ptr && ((void *)zone < best || best == NULL)) {
@@ -143,7 +141,6 @@ void		*ft_find_next_zone_or_large(void *ptr, int *type) {
 		zone = zone->next;
 	}
 
-	// ------------------ search in small
 	zone = g_.small_first_zone;
 	while (zone) {
 		if ((void *)zone > ptr && ((void *)zone < best || best == NULL)) {
@@ -153,7 +150,6 @@ void		*ft_find_next_zone_or_large(void *ptr, int *type) {
 		zone = zone->next;
 	}
 
-	// ------------------ search in large
 	large = g_.larges;
 	while (large) {
 		if ((void *)large > ptr && ((void *)large < best || best == NULL)) {
@@ -188,71 +184,289 @@ void		show_alloc_mem(void)
 	pthread_mutex_unlock(&g_lock);		// UNLOCK
 }
 
-/*
-// *************** //
-// **** BONUS **** //
-// *************** //
+void ft_show_error(bool error) {
+	write(STDOUT_FILENO, "\n      error:\t\t", 15);
+	if (error) {
+		write(STDOUT_FILENO, ANSI_COLOR_RED, ANSI_COLOR_LEN);
+		write(STDOUT_FILENO, "true", 4);
+		write(STDOUT_FILENO, ANSI_COLOR_RESET, ANSI_COLOR_LEN);
+	}
+	else
+		write(STDOUT_FILENO, "false", 5);
+	write(STDOUT_FILENO, "\n", 1);
+}
+
+void ft_show_zone_type(int zone_type, int new_zone_type) {
+	if (zone_type == TINY)
+		write(STDOUT_FILENO, "tiny", 4);
+	else if (zone_type == SMALL)
+		write(STDOUT_FILENO, "small", 5);
+	else if (zone_type == LARGE)
+		write(STDOUT_FILENO, "large", 5);
+	else
+		write(STDOUT_FILENO, "nowhere", 7);
+	
+	if (new_zone_type != NOTHING) {
+		write(STDOUT_FILENO, " > ", 3);
+		if (new_zone_type == TINY)
+			write(STDOUT_FILENO, "tiny", 4);
+		else if (new_zone_type == SMALL)
+			write(STDOUT_FILENO, "small", 5);
+		else if (new_zone_type == LARGE)
+			write(STDOUT_FILENO, "large", 5);
+		else
+			write(STDOUT_FILENO, "nowhere", 7);
+	}
+}
+
+void ft_show_action_malloc(t_action *action) {
+	write(STDOUT_FILENO, ANSI_COLOR_YELLOW, ANSI_COLOR_LEN);
+	write(STDOUT_FILENO, "   action", 9);
+	write(STDOUT_FILENO, ANSI_COLOR_RESET, ANSI_COLOR_LEN);
+	write(STDOUT_FILENO, ": malloc\n", 9);
+
+	write(STDOUT_FILENO, "      address:\t\t", 16);
+	ft_putaddress((unsigned long)action->address);
+	write(STDOUT_FILENO, "\n      size:\t\t", 14);
+	ft_putnbr(action->size);
+	write(STDOUT_FILENO, "\n      zone type:\t", 18);
+
+	if (action->zone_type == LARGE) {
+		write(STDOUT_FILENO, "large", 5);
+		write(STDOUT_FILENO, "\n      block/zone:\t", 20);
+		ft_putaddress((unsigned long)action->block_or_large);
+	}
+	else if (action->zone_type == NOWHERE) {
+			write(STDOUT_FILENO, "nowhere", 7);
+	}
+	else {
+		if (action->zone_type == TINY)
+			write(STDOUT_FILENO, "tiny", 4);
+		else
+			write(STDOUT_FILENO, "small", 5);
+		write(STDOUT_FILENO, "\n      block:\t\t", 15);
+		ft_putaddress((unsigned long)action->block_or_large);
+		write(STDOUT_FILENO, "\n      zone:\t\t", 14);
+		ft_putaddress((unsigned long)action->zone);
+	}
+
+	ft_show_error(action->error);
+}
+
+void ft_show_action_free(t_action *action) {
+	write(STDOUT_FILENO, ANSI_COLOR_YELLOW, ANSI_COLOR_LEN);
+	write(STDOUT_FILENO, "   action", 9);
+	write(STDOUT_FILENO, ANSI_COLOR_RESET, ANSI_COLOR_LEN);
+	write(STDOUT_FILENO, ": free\n", 7);
+
+	write(STDOUT_FILENO, "      address:\t\t", 16);
+	ft_putaddress((unsigned long)action->address);
+	write(STDOUT_FILENO, "\n      size:\t\t", 14);
+	ft_putnbr(action->size);
+	write(STDOUT_FILENO, "\n      zone type:\t", 19);
+
+	if (action->zone_type == LARGE) {
+		write(STDOUT_FILENO, "large", 5);
+		write(STDOUT_FILENO, "\n      block/zone:\t", 20);
+		ft_putaddress((unsigned long)action->block_or_large);
+	}
+	else if (action->zone_type == NOWHERE) {
+			write(STDOUT_FILENO, "nowhere", 7);
+	}
+	else {
+		if (action->zone_type == TINY)
+			write(STDOUT_FILENO, "tiny", 4);
+		else
+			write(STDOUT_FILENO, "small", 5);
+		write(STDOUT_FILENO, "\n      block:\t\t", 15);
+		ft_putaddress((unsigned long)action->block_or_large);
+		write(STDOUT_FILENO, "\n      zone:\t\t", 14);
+		ft_putaddress((unsigned long)action->zone);
+	}
+
+	ft_show_error(action->error);
+}
+
+void ft_show_action_realloc(t_action *action) {
+	write(STDOUT_FILENO, ANSI_COLOR_YELLOW, ANSI_COLOR_LEN);
+	write(STDOUT_FILENO, "   action", 9);
+	write(STDOUT_FILENO, ANSI_COLOR_RESET, ANSI_COLOR_LEN);
+	write(STDOUT_FILENO, ": realloc\n", 10);
+
+	write(STDOUT_FILENO, "      address:\t\t", 16);
+	ft_putaddress((unsigned long)action->address);
+	write(STDOUT_FILENO, " > ", 3);
+	ft_putaddress((unsigned long)action->new_address);
+	write(STDOUT_FILENO, "\n      size:\t\t", 14);
+	ft_putnbr(action->size);
+	write(STDOUT_FILENO, " > ", 3);
+	ft_putnbr(action->new_size);
+	write(STDOUT_FILENO, "\n      zone type:\t", 18);
+	ft_show_zone_type(action->zone_type, action->new_zone_type);
+	write(STDOUT_FILENO, "\n      block:\t\t", 15);
+	ft_putaddress((unsigned long)action->block_or_large);
+	write(STDOUT_FILENO, " > ", 3);
+	ft_putaddress((unsigned long)action->new_block_or_large);
+	write(STDOUT_FILENO, "\n      zone:\t\t", 14);
+	ft_putaddress((unsigned long)action->zone);
+	write(STDOUT_FILENO, " > ", 3);
+	ft_putaddress((unsigned long)action->new_zone);
+
+	ft_show_error(action->error);
+}
+
+void show_history(int depth) {
+	pthread_mutex_lock(&g_lock);		// LOCK
+
+	int showed = g_.actions;
+	if (depth < showed)
+		showed = depth;
+	if (HISTORY_SIZE < depth)
+		showed = HISTORY_SIZE;
+
+	write(STDOUT_FILENO, ANSI_COLOR_YELLOW, ANSI_COLOR_LEN);
+	write(STDOUT_FILENO, "\nhistory", 8);
+	write(STDOUT_FILENO, ANSI_COLOR_RESET, ANSI_COLOR_LEN);
+	write(STDOUT_FILENO, ": [actions:", 11);
+
+	ft_putnbr(g_.actions);
+    write(STDOUT_FILENO, "] [showed:", 10);
+	ft_putnbr(showed);
+    write(STDOUT_FILENO, "]\n", 2);
+
+	for (int i = 0; i < showed; i++)
+		switch (g_.history[i].type)
+		{
+			case TINY:
+				ft_show_action_malloc(&g_.history[i]);
+				break;
+			case SMALL:
+				ft_show_action_free(&g_.history[i]);
+				break;
+			case LARGE:
+				ft_show_action_realloc(&g_.history[i]);
+				break;
+		}
+	write(STDOUT_FILENO, "\n", 1);
+	pthread_mutex_unlock(&g_lock);		// UNLOCK
+}
+
 void ft_show_zone(t_zone *zone) {
     if (zone) {
         t_block *block;
         block = zone->blocks;
         while (block) {
-			printf(ANSI_COLOR_YELLOW "      block " ANSI_COLOR_RESET "%p :\n" , block);
-            printf("         prev : %p\n", block->prev);
-            printf("         free : %s\t%s: " ANSI_COLOR_GREEN "%ld\n" ANSI_COLOR_RESET, block->free ? ANSI_COLOR_BLUE "true" ANSI_COLOR_RESET: ANSI_COLOR_RED "false" ANSI_COLOR_RESET, block->size != 0 ? "bytes" : "byte", block->size);
-            printf("         next : %p\n", block->next);
+			write(STDOUT_FILENO, ANSI_COLOR_YELLOW, ANSI_COLOR_LEN);
+			write(STDOUT_FILENO, "      block ", 12);
+			write(STDOUT_FILENO, ANSI_COLOR_RESET, ANSI_COLOR_LEN);
+			ft_putaddress((unsigned long)block);
+			write(STDOUT_FILENO, ":\n", 2);
+
+			write(STDOUT_FILENO, "         prev: ", 15);
+			ft_putaddress((unsigned long)block->prev);
+			write(STDOUT_FILENO, "\n         free: ", 16);
+			if (block->free) {
+				write(STDOUT_FILENO, ANSI_COLOR_BLUE, ANSI_COLOR_LEN);
+				write(STDOUT_FILENO, "true", 4);
+				write(STDOUT_FILENO, ANSI_COLOR_RESET, ANSI_COLOR_LEN);
+			}
+			else {
+				write(STDOUT_FILENO, ANSI_COLOR_RED, ANSI_COLOR_LEN);
+				write(STDOUT_FILENO, "false", 5);
+				write(STDOUT_FILENO, ANSI_COLOR_RESET, ANSI_COLOR_LEN);
+			}
+			write(STDOUT_FILENO, "\t", 1);
+			ft_putnbr(block->size);
+			if (block->size != 1)
+				write(STDOUT_FILENO, "\tbytes", 6);
+			else
+				write(STDOUT_FILENO, "\tbyte", 5);
+			write(STDOUT_FILENO, "\n         next: ", 17);
+			ft_putaddress((unsigned long)block->next);
+			write(STDOUT_FILENO, "\n", 1);
+
+
             block = block->next;
         }
-		printf("\n");
+		write(STDOUT_FILENO, "\n", 1);
     }
 }
 
-// *************** //
-// **** BONUS **** //
-// *************** //
 void ft_show_large(t_large *large) {
 	if (large) {
-		printf(ANSI_COLOR_YELLOW "      block " ANSI_COLOR_RESET "%p :\n" , large);
-		printf("         prev : %p\n", large->prev);
-		printf("         %s: " ANSI_COLOR_GREEN "%ld\n" ANSI_COLOR_RESET, large->size != 0 ? "bytes" : "byte", large->size);
-		printf("         next : %p\n\n", large->next);
+		write(STDOUT_FILENO, ANSI_COLOR_YELLOW, ANSI_COLOR_LEN);
+		write(STDOUT_FILENO, "      block ", 12);
+		write(STDOUT_FILENO, ANSI_COLOR_RESET, ANSI_COLOR_LEN);
+		ft_putaddress((unsigned long)large);
+		write(STDOUT_FILENO, ":\n", 2);
+
+		write(STDOUT_FILENO, "         prev:\t", 15);
+		ft_putaddress((unsigned long)large->prev);
+		write(STDOUT_FILENO, "\n         ", 10);
+		if (large->size != 1)
+			write(STDOUT_FILENO, "bytes", 5);
+		else
+			write(STDOUT_FILENO, "byte", 4);
+		write(STDIN_FILENO, ":\t", 2);
+		ft_putnbr((unsigned long)large->size);
+		write(STDOUT_FILENO, "\n         next:\t", 17);
+		ft_putaddress((unsigned long)large->next);
+		write(STDIN_FILENO, "\n\n", 2);
 	}
 }
 
-// *************** //
-// **** BONUS **** //
-// *************** //
 void show_alloc_mem_ex(void) {
 	pthread_mutex_lock(&g_lock);		// LOCK
-    printf("\n===============================================\n");
-    printf("============== show_alloc_mem_ex ==============\n");
-    printf("===============================================\n\n");
-    t_zone *zone = g_.tiny_first_zone;
+    
+	t_zone *zone = g_.tiny_first_zone;
+
 	if (zone) {
-		printf(ANSI_COLOR_YELLOW "tiny" ANSI_COLOR_RESET " :\n");
+		write(STDOUT_FILENO, ANSI_COLOR_YELLOW, ANSI_COLOR_LEN);
+		write(STDOUT_FILENO, "\ntiny", 5);
+		write(STDOUT_FILENO, ANSI_COLOR_RESET, ANSI_COLOR_LEN);
+		write(STDOUT_FILENO, ":\n", 2);
+
 		while (zone) {
-			printf(ANSI_COLOR_YELLOW "   zone " ANSI_COLOR_RESET "%p :\n" , zone);
+			write(STDOUT_FILENO, ANSI_COLOR_YELLOW, ANSI_COLOR_LEN);
+			write(STDOUT_FILENO, "   zone ", 8);
+			write(STDOUT_FILENO, ANSI_COLOR_RESET, ANSI_COLOR_LEN);
+			ft_putaddress((unsigned long)zone);
+			write(STDOUT_FILENO, ":\n", 2);
+
 			ft_show_zone(zone);
 			zone = zone->next;
 		}
 	}
     zone = g_.small_first_zone;
 	if (zone) {
-    	printf(ANSI_COLOR_YELLOW "small" ANSI_COLOR_RESET " :\n");
+		write(STDOUT_FILENO, ANSI_COLOR_YELLOW, ANSI_COLOR_LEN);
+		write(STDOUT_FILENO, "small", 5);
+		write(STDOUT_FILENO, ANSI_COLOR_RESET, ANSI_COLOR_LEN);
+		write(STDOUT_FILENO, ":\n", 2);
+
 		while (zone) {
-			printf(ANSI_COLOR_YELLOW "   zone " ANSI_COLOR_RESET "%p :\n" , zone);
+			write(STDOUT_FILENO, ANSI_COLOR_YELLOW, ANSI_COLOR_LEN);
+			write(STDOUT_FILENO, "   zone ", 8);
+			write(STDOUT_FILENO, ANSI_COLOR_RESET, ANSI_COLOR_LEN);
+			ft_putaddress((unsigned long)zone);
+			write(STDOUT_FILENO, ":\n", 2);
+
 			ft_show_zone(zone);
 			zone = zone->next;
 		}
 	}
     t_large *large = g_.larges;
 	if (large) {
-		printf(ANSI_COLOR_YELLOW "large" ANSI_COLOR_RESET " :\n");
+		write(STDOUT_FILENO, ANSI_COLOR_YELLOW, ANSI_COLOR_LEN);
+		write(STDOUT_FILENO, "large", 5);
+		write(STDOUT_FILENO, ANSI_COLOR_RESET, ANSI_COLOR_LEN);
+		write(STDOUT_FILENO, ":\n", 2);
+
 		while (large) {
 			ft_show_large(large);
 			large = large->next;
 		}
 	}
+	write(STDOUT_FILENO, "\n", 1);
 	pthread_mutex_unlock(&g_lock);		// UNLOCK
 }
-*/

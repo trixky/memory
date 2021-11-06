@@ -2,6 +2,7 @@
 
 int      main()
 {
+
    int   i;
    char  *addr;
 

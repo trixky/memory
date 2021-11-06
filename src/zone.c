@@ -64,19 +64,22 @@ t_zone *ft_find_zone_from_pointer(void *ptr, int *zone_type) {
 
         return zone;
     }
+
     return NULL;
 }
 
 t_zone *ft_malloc_zone(t_zone *prev_zone, int zone_size) {
     t_zone *zone = (t_zone *)mmap(0, zone_size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
-
-    zone->blocks = (t_block *)(zone + 1);
-    zone->blocks->free = true;
-    zone->blocks->size = zone_size - STRUCT_ZONE_SIZE - STRUCT_BLOCK_SIZE;
-    zone->blocks->prev = NULL;
-    zone->blocks->next = NULL;
-    zone->prev = prev_zone;
-    zone->next = NULL;
+    
+    if ((void *)zone != (void *)-1) {
+        zone->blocks = (t_block *)(zone + 1);
+        zone->blocks->free = true;
+        zone->blocks->size = zone_size - STRUCT_ZONE_SIZE - STRUCT_BLOCK_SIZE;
+        zone->blocks->prev = NULL;
+        zone->blocks->next = NULL;
+        zone->prev = prev_zone;
+        zone->next = NULL;
+    }
 
     return zone;
 }

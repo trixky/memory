@@ -7,3 +7,5 @@ a.out
 .vscode
 # objects
 obj
+# mains
+tests/main*

@@ -8,5 +8,7 @@ int main()
    malloc(1024 * 1024 * 16);
    malloc(1024 * 1024 * 128);
    show_alloc_mem();
+   show_alloc_mem();
+   show_history(5);
    return (0);
 }

@@ -1,24 +1,40 @@
 #include "libft_malloc.h"
 
-void free(void *ptr) {
-
+void ft_free(void *ptr, bool history) {
     if (ptr) {
-        int zone_type;
-        pthread_mutex_lock(&g_lock);        // LOCK
-        t_zone *zone = ft_find_zone_from_pointer(ptr, &zone_type);
+        int     zone_type;
+        bool    zone_freed = false;
+        t_zone  *zone = ft_find_zone_from_pointer(ptr, &zone_type);
+
         if (zone) {
             t_block *block = ft_find_block_in_a_zone_from_pointer(ptr, zone);
             if (block) {
                 ft_free_block(block);
-                if ((zone->prev || zone->next) && zone->blocks && !zone->blocks->next && zone->blocks->free)
+                if ((zone->prev || zone->next) && zone->blocks && !zone->blocks->next && zone->blocks->free) {
+                    zone_freed = true;
                     ft_free_zone(zone, zone_type);
+                }
+                if (history)
+                    ft_push_free_in_history(ptr, block->size, zone_type, block, zone, zone_freed);
+                return ;
             }
         }
         else {
             t_large *large = ft_find_large_from_pointer(ptr);
-            if (large)
+            if (large) {
                 ft_free_large(large);
+                if (history)
+                    ft_push_free_in_history(ptr, large->size, LARGE, large, NULL, true);
+                return ;
+            }
         }
-        pthread_mutex_unlock(&g_lock);      // UNLOCK
+        if (history)
+            ft_push_free_error_in_history(ptr);
     }
+}
+
+void free(void *ptr) {
+    pthread_mutex_lock(&g_lock);        // LOCK
+    ft_free(ptr, true);
+    pthread_mutex_unlock(&g_lock);      // UNLOCK
 }
