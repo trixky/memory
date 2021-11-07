@@ -7,6 +7,7 @@ size_t			ft_strlen(const char *str)
 	ptr = str;
 	while (*ptr)
 		++ptr;
+
 	return (ptr - str);
 }
 
@@ -80,6 +81,7 @@ size_t		ft_print_block(t_block *block)
 		write(STDOUT_FILENO, " : ", 3);
 		ft_putnbr(block->size);
 		write(STDOUT_FILENO, " octets\n", 8);
+
 		return (block->size);
 	}
 
@@ -99,6 +101,7 @@ size_t		ft_print_large(t_large *large)
 		write(STDOUT_FILENO, " : ", 3);
 		ft_putnbr(large->size);
 		write(STDOUT_FILENO, " octets\n", 8);
+
 		return (large->size);
 	}
 

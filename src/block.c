@@ -76,7 +76,7 @@ void ft_free_block(t_block *block) {
                 ft_merge_surrounding_free_blocks(block);
             else
                 merge_prev: ft_merge_previous_free_block(block);
-            goto skip_set_free;
+            return ;
         }
         else if (block->next->free)
             merge_next: ft_merge_next_free_block(block);
@@ -87,6 +87,4 @@ void ft_free_block(t_block *block) {
         goto merge_next;
 
     block->free = true;
-
-    skip_set_free: return ;
 }

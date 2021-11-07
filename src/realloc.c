@@ -45,6 +45,7 @@ void *ft_realloc_in_zones(void *ptr, size_t size, bool history) {
                 ft_free_block(block);
 
             }
+
             return ptr;
         }
     }
@@ -70,6 +71,7 @@ void *ft_realloc_in_larges(void *ptr, size_t size, bool history) {
             
             ft_copy_data(large + 1, ptr, large->size < size ? large->size : size);
             ft_free_large(large);
+
             return ptr;
         }
     }
@@ -82,6 +84,7 @@ void *ft_realloc_in_larges(void *ptr, size_t size, bool history) {
 void *ft_realloc(void *ptr, size_t size, bool history) {
     if (ptr) {
         void *new_ptr = ft_realloc_in_zones(ptr, size, history);
+
         return new_ptr != NULL ? new_ptr : ft_realloc_in_larges(ptr, size, history);
     }
 

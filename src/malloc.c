@@ -12,6 +12,7 @@ void *ft_malloc_in_specific_zone_type(size_t size, t_zone **first_zone, t_zone *
         if ((void *)zone == (void *)-1) {
             if (history)
                 ft_push_malloc_error_in_history(size);
+
             return NULL;
         }
         *first_zone = zone;
@@ -23,6 +24,7 @@ void *ft_malloc_in_specific_zone_type(size_t size, t_zone **first_zone, t_zone *
         if ((void *)zone == (void *)-1) {
             if (history)
                 ft_push_malloc_error_in_history(size);
+
             return NULL;
         }
         (*last_zone)->next = zone;
@@ -33,6 +35,7 @@ void *ft_malloc_in_specific_zone_type(size_t size, t_zone **first_zone, t_zone *
 
     if (history)
         ft_push_malloc_in_history(block + 1, size, zone_type, block, zone);
+
     return block + 1;
 }
 
@@ -42,6 +45,7 @@ void *ft_malloc_out_of_zone(size_t size, bool history) {
     if ((void *)large == (void *)-1) {
         if (history)
             ft_push_malloc_error_in_history(size);
+
         return NULL;
     }
 
