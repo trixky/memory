@@ -167,6 +167,8 @@ int 		ft_free_zone(t_zone *zone, int zone_type);
 /*
 
 BONUS:
+	- free security
+	- realloc security
 	- defragmentation free
 	- defragmentation realloc
 	- best fit
