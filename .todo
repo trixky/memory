@@ -1,5 +1,0 @@
-* attention au malloc 0 (actuellement on peut pas a cause d'un +1)
-* tout les size sont bien des long int ?
-* // ATTENTION --I OU i-1   (chercker le copi pour block et large)
-* g_.actions overflow
-* realloc large: if become a small or tiny > remove from large
