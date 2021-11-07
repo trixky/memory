@@ -227,7 +227,7 @@ void ft_show_action_malloc(t_action *action) {
 
 	write(STDOUT_FILENO, "      address:\t\t", 16);
 	ft_putaddress((unsigned long)action->address);
-	write(STDOUT_FILENO, "\n      size:\t\t", 14);
+	write(STDOUT_FILENO, "\n      bytes:\t\t", 15);
 	ft_putnbr(action->size);
 	write(STDOUT_FILENO, "\n      zone type:\t", 18);
 
@@ -261,7 +261,7 @@ void ft_show_action_free(t_action *action) {
 
 	write(STDOUT_FILENO, "      address:\t\t", 16);
 	ft_putaddress((unsigned long)action->address);
-	write(STDOUT_FILENO, "\n      size:\t\t", 14);
+	write(STDOUT_FILENO, "\n      bytes:\t\t", 15);
 	ft_putnbr(action->size);
 	write(STDOUT_FILENO, "\n      zone type:\t", 19);
 
@@ -297,7 +297,7 @@ void ft_show_action_realloc(t_action *action) {
 	ft_putaddress((unsigned long)action->address);
 	write(STDOUT_FILENO, " > ", 3);
 	ft_putaddress((unsigned long)action->new_address);
-	write(STDOUT_FILENO, "\n      size:\t\t", 14);
+	write(STDOUT_FILENO, "\n      bytes:\t\t", 15);
 	ft_putnbr(action->size);
 	write(STDOUT_FILENO, " > ", 3);
 	ft_putnbr(action->new_size);

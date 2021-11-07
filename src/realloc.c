@@ -8,7 +8,7 @@ void ft_copy_data(void *data_src, void *data_dst, size_t len) {
 void *ft_realloc_in_zones(void *ptr, size_t size, bool history) {
     int zone_type;
     t_zone *zone = ft_find_zone_from_pointer(ptr, &zone_type);
-
+    
     if (zone) {
         t_block *block = ft_find_block_in_a_zone_from_pointer(ptr, zone);
 
@@ -21,7 +21,7 @@ void *ft_realloc_in_zones(void *ptr, size_t size, bool history) {
                     ft_shift_next_block(block, size);
                 push_realloc_with_same_block: ft_push_realloc_in_history(ptr, ptr, old_size, size, zone_type, zone_type, block, block, zone, zone, false);
             }
-            else if (block->next && block->next->free && size < block->size + block->next->size + STRUCT_BLOCK_SIZE) {
+            else if (block->next && block->next->free && size < block->size + block->next->size + STRUCT_BLOCK_SIZE && GET_ZONE_TYPE(size) == GET_ZONE_TYPE(block->size)) {
                 if (size < block->size + block->next->size)
                     ft_shift_next_block(block, size);
                 else
