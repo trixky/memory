@@ -139,7 +139,7 @@ void		ft_free(void *ptr, bool history);
 void		free(void *ptr);
 // ----------------------------------------- history.c
 void 		ft_push_malloc_error_in_history(size_t size);
-void ft_push_malloc_in_history(void *address, size_t size, int zone_type, void *block_or_large, t_zone *zone);
+void		ft_push_malloc_in_history(void *address, size_t size, int zone_type, void *block_or_large, t_zone *zone);
 void		ft_push_free_error_in_history(void *address);
 void		ft_push_free_in_history(void *address, size_t size, int zone_type, void *block_or_large, t_zone *zone, int zone_freed);
 void		ft_push_realloc_error_in_history(void *address, size_t new_size);
